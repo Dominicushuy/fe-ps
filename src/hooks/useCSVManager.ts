@@ -1,4 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 import {
     CSVManagerMode,
     CSVRow,
@@ -10,6 +12,7 @@ import { mockCSVData } from "@/data/mock-csv-data";
 import { downloadCSV } from "@/lib/utils/csv-export";
 
 export function useCSVManager() {
+    const router = useRouter();
     const [mode, setMode] = useState<CSVManagerMode>(CSVManagerMode.UPLOAD);
     const [selectedClient, setSelectedClient] = useState<Client | null>(null);
     const [file, setFile] = useState<File | null>(null);
@@ -29,6 +32,9 @@ export function useCSVManager() {
         useState(false);
     const [pendingClientChange, setPendingClientChange] =
         useState<Client | null>(null);
+
+    // Thêm state cho navigation confirm dialog
+    const [showNavigationConfirm, setShowNavigationConfirm] = useState(false);
 
     // Effect mới để load mock data khi ở chế độ Download
     useEffect(() => {
@@ -113,6 +119,7 @@ export function useCSVManager() {
         [],
     );
 
+    // Cập nhật hàm handleSubmitData để hiển thị toast và navigation dialog
     const handleSubmitData = useCallback(() => {
         if (!isValid) return;
 
@@ -122,12 +129,50 @@ export function useCSVManager() {
         setTimeout(() => {
             // Trong trường hợp thực tế, đây là nơi bạn sẽ gửi dữ liệu lên server
             console.log("Submitting data:", data);
-            setIsSubmitting(false);
 
-            // Sau khi submit thành công, lưu dữ liệu vào state để hiển thị
-            setData([...data]);
+            // Clear file và data sau khi submit thành công
+            setFile(null);
+
+            // Giữ lại data trong state để hiển thị thông báo thành công (optional)
+            // setData([...data]);
+
+            // Hiển thị thông báo thành công với toast
+            toast.success(
+                "データが正常にアップロードされました！(Data successfully uploaded!)",
+                {
+                    position: "top-right",
+                    autoClose: 5000,
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                },
+            );
+
+            // Hiển thị dialog xác nhận chuyển hướng
+            setShowNavigationConfirm(true);
+
+            setIsSubmitting(false);
         }, 1500);
     }, [isValid, data]);
+
+    // Hàm xử lý khi xác nhận chuyển hướng sang activity-log
+    const handleNavigateToActivityLog = useCallback(() => {
+        if (selectedClient) {
+            // Đóng dialog
+            setShowNavigationConfirm(false);
+
+            // Chuyển hướng sang trang activity-log với clientId là query param
+            router.push(
+                `/parameter-storage/activity-log?clientId=${selectedClient.id}`,
+            );
+        }
+    }, [selectedClient, router]);
+
+    // Hàm đóng dialog xác nhận chuyển hướng mà không thực hiện chuyển hướng
+    const handleCloseNavigationDialog = useCallback(() => {
+        setShowNavigationConfirm(false);
+    }, []);
 
     // Thêm handler cho việc export CSV
     const handleExportCSV = useCallback(
@@ -171,6 +216,7 @@ export function useCSVManager() {
         itemsPerPage,
         showClientChangeConfirm,
         pendingClientChange,
+        showNavigationConfirm,
         handleModeChange,
         handleClientSelect,
         handleFileSelect,
@@ -185,6 +231,9 @@ export function useCSVManager() {
         // Thêm handlers cho dialog xác nhận
         handleConfirmClientChange,
         handleCancelClientChange,
+        // Thêm handlers cho navigation dialog
+        handleNavigateToActivityLog,
+        handleCloseNavigationDialog,
         // Giữ lại các setters để hỗ trợ các trường hợp khác
         setFilters,
         setSearchTerm,

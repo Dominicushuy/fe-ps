@@ -192,8 +192,9 @@ export default function CSVPreview({
 
     // Xử lý việc submit với xác nhận ghi đè
     const handleSubmit = () => {
-        if (onSubmit && isValid && confirmOverwrite) {
+        if (onSubmit && isValid) {
             onSubmit();
+            // Không cần clear file ở đây vì sẽ được clear từ hook useCSVManager
         }
     };
 

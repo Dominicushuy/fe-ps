@@ -1,8 +1,7 @@
-// /app/activity-log/page.tsx
-
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import ClientSelect from "@/components/csv-manager/ClientSelect";
 import DateRangeFilter from "@/components/activity-manager/DateRangeFilter";
 import TypeFilter from "@/components/activity-manager/TypeFilter";
@@ -22,15 +21,18 @@ import {
     AdjustmentsHorizontalIcon,
     XMarkIcon,
 } from "@heroicons/react/24/outline";
+import { mockClients } from "@/data/mock-clients";
 
 export default function ActivityLogPage() {
+    const searchParams = useSearchParams();
+    const clientIdParam = searchParams.get("clientId");
+
     const {
         filters,
         paginatedData,
         currentPage,
         itemsPerPage,
         totalItems,
-        filteredData,
         handleClientSelect,
         handleDateOptionChange,
         handleCustomDateChange,
@@ -42,15 +44,22 @@ export default function ActivityLogPage() {
 
     // State để toggle hiển thị/ẩn bộ lọc trên mobile
     const [showFilters, setShowFilters] = useState(false);
+    const [isInitialLoad, setIsInitialLoad] = useState(true);
 
-    // Đếm số lượng hoạt động theo từng trạng thái
-    const successCount = filteredData.filter(
-        a => a.status === "Success",
-    ).length;
-    const processingCount = filteredData.filter(
-        a => a.status === "Processing",
-    ).length;
-    const failedCount = filteredData.filter(a => a.status === "Failed").length;
+    // Xử lý clientId từ URL parameters
+    useEffect(() => {
+        if (clientIdParam && isInitialLoad) {
+            // Tìm client trong danh sách clients dựa trên id
+            const client = mockClients.find(c => c.id === clientIdParam);
+
+            if (client) {
+                // Cập nhật filter theo client
+                handleClientSelect(client);
+            }
+
+            setIsInitialLoad(false);
+        }
+    }, [clientIdParam, handleClientSelect, isInitialLoad]);
 
     return (
         <div className="space-y-6">
@@ -202,61 +211,6 @@ export default function ActivityLogPage() {
                                 ) : null}
                                 Status: {filters.status}
                             </span>
-                        </div>
-                    </div>
-
-                    {/* Stats Cards */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-                        <div className="bg-gray-50 p-3 rounded-lg border border-gray-200 flex items-center">
-                            <div className="rounded-full bg-primary-100 p-1.5 mr-2">
-                                <ClipboardDocumentListIcon className="h-4 w-4 text-primary-700" />
-                            </div>
-                            <div>
-                                <p className="text-xs text-gray-500">Total</p>
-                                <p className="text-lg font-semibold text-gray-800">
-                                    {totalItems}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="bg-green-50 p-3 rounded-lg border border-green-100 flex items-center">
-                            <div className="rounded-full bg-green-100 p-1.5 mr-2">
-                                <CheckCircleIcon className="h-4 w-4 text-green-700" />
-                            </div>
-                            <div>
-                                <p className="text-xs text-green-500">
-                                    Success
-                                </p>
-                                <p className="text-lg font-semibold text-green-700">
-                                    {successCount}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="bg-yellow-50 p-3 rounded-lg border border-yellow-100 flex items-center">
-                            <div className="rounded-full bg-yellow-100 p-1.5 mr-2">
-                                <ClockIcon className="h-4 w-4 text-yellow-700" />
-                            </div>
-                            <div>
-                                <p className="text-xs text-yellow-500">
-                                    Processing
-                                </p>
-                                <p className="text-lg font-semibold text-yellow-700">
-                                    {processingCount}
-                                </p>
-                            </div>
-                        </div>
-
-                        <div className="bg-red-50 p-3 rounded-lg border border-red-100 flex items-center">
-                            <div className="rounded-full bg-red-100 p-1.5 mr-2">
-                                <ExclamationCircleIcon className="h-4 w-4 text-red-700" />
-                            </div>
-                            <div>
-                                <p className="text-xs text-red-500">Failed</p>
-                                <p className="text-lg font-semibold text-red-700">
-                                    {failedCount}
-                                </p>
-                            </div>
                         </div>
                     </div>
 

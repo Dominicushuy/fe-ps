@@ -1,6 +1,8 @@
 "use client";
 
 import React from "react";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import ModeToggle from "@/components/csv-manager/ModeToggle";
 import ClientSelect from "@/components/csv-manager/ClientSelect";
 import UploadZone from "@/components/csv-manager/UploadZone";
@@ -12,8 +14,8 @@ import Pagination from "@/components/csv-manager/Pagination";
 import DownloadButton from "@/components/csv-manager/DownloadButton";
 import { CSVManagerMode } from "@/types";
 import { useCSVManager } from "@/hooks/useCSVManager";
-import { CheckCircleIcon } from "@heroicons/react/24/outline";
 import ConfirmClientChangeDialog from "@/components/csv-manager/ConfirmClientChangeDialog";
+import NavigationConfirmDialog from "@/components/csv-manager/NavigationConfirmDialog";
 
 export default function CSVManagerPage() {
     const {
@@ -29,6 +31,7 @@ export default function CSVManagerPage() {
         itemsPerPage,
         showClientChangeConfirm,
         pendingClientChange,
+        showNavigationConfirm,
         handleModeChange,
         handleClientSelect,
         handleFileSelect,
@@ -41,6 +44,8 @@ export default function CSVManagerPage() {
         handleExportCSV,
         handleConfirmClientChange,
         handleCancelClientChange,
+        handleNavigateToActivityLog,
+        handleCloseNavigationDialog,
     } = useCSVManager();
 
     // Function để tạo tên file có timestamp
@@ -59,6 +64,9 @@ export default function CSVManagerPage() {
 
     return (
         <div className="space-y-8">
+            {/* Toast Container */}
+            <ToastContainer />
+
             <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
                 <h2 className="text-xl font-semibold mb-6 text-primary-900 border-b border-primary-100 pb-3">
                     Parame Storage Manager
@@ -106,6 +114,14 @@ export default function CSVManagerPage() {
                     newClient={pendingClientChange}
                 />
 
+                {/* Navigation Confirmation Dialog */}
+                <NavigationConfirmDialog
+                    isOpen={showNavigationConfirm}
+                    onClose={handleCloseNavigationDialog}
+                    onConfirm={handleNavigateToActivityLog}
+                    client={selectedClient}
+                />
+
                 {/* Upload Zone - chỉ hiển thị khi mode là UPLOAD */}
                 {mode === CSVManagerMode.UPLOAD && (
                     <div className="mb-6">
@@ -132,38 +148,6 @@ export default function CSVManagerPage() {
                                 isSubmitting={isSubmitting}
                                 onSubmit={handleSubmitData}
                             />
-                        )}
-
-                        {/* Hiển thị thông báo thành công khi đã submit dữ liệu trong chế độ Upload */}
-                        {data.length > 0 && isValid && !file && (
-                            <div className="mt-6 p-4 bg-green-50 rounded-lg border border-green-200">
-                                <div className="flex items-start">
-                                    <CheckCircleIcon className="h-6 w-6 text-green-500 mr-3 flex-shrink-0" />
-                                    <div>
-                                        <h3 className="text-green-800 font-medium">
-                                            データが正常にアップロードされました！(Data
-                                            successfully uploaded!)
-                                        </h3>
-                                        <p className="text-green-700 mt-2">
-                                            合計{" "}
-                                            <span className="font-medium">
-                                                {data.length}
-                                            </span>{" "}
-                                            レコードがアップロードされました。
-                                            (Total{" "}
-                                            <span className="font-medium">
-                                                {data.length}
-                                            </span>{" "}
-                                            records have been uploaded.)
-                                        </p>
-                                        <p className="text-green-600 mt-2 text-sm">
-                                            新しいファイルをアップロードするには、上記の「アップロード」セクションを使用してください。
-                                            (To upload a new file, use the
-                                            upload section above.)
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
                         )}
                     </div>
                 )}
