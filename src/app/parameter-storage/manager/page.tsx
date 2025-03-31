@@ -13,6 +13,7 @@ import DownloadButton from "@/components/csv-manager/DownloadButton";
 import { CSVManagerMode } from "@/types";
 import { useCSVManager } from "@/hooks/useCSVManager";
 import { CheckCircleIcon } from "@heroicons/react/24/outline";
+import ConfirmClientChangeDialog from "@/components/csv-manager/ConfirmClientChangeDialog";
 
 export default function CSVManagerPage() {
     const {
@@ -26,6 +27,8 @@ export default function CSVManagerPage() {
         searchTerm,
         currentPage,
         itemsPerPage,
+        showClientChangeConfirm,
+        pendingClientChange,
         handleModeChange,
         handleClientSelect,
         handleFileSelect,
@@ -36,6 +39,8 @@ export default function CSVManagerPage() {
         handlePageChange,
         handleItemsPerPageChange,
         handleExportCSV,
+        handleConfirmClientChange,
+        handleCancelClientChange,
     } = useCSVManager();
 
     // Function để tạo tên file có timestamp
@@ -92,10 +97,20 @@ export default function CSVManagerPage() {
                     )}
                 </div>
 
+                {/* Confirmation Dialog for Client Change */}
+                <ConfirmClientChangeDialog
+                    isOpen={showClientChangeConfirm}
+                    onClose={handleCancelClientChange}
+                    onConfirm={handleConfirmClientChange}
+                    currentClient={selectedClient}
+                    newClient={pendingClientChange}
+                />
+
                 {/* Upload Zone - chỉ hiển thị khi mode là UPLOAD */}
                 {mode === CSVManagerMode.UPLOAD && (
                     <div className="mb-6">
                         <UploadZone
+                            externalFile={file}
                             onFileSelect={handleFileSelect}
                             disabled={!selectedClient}
                         />
@@ -112,6 +127,7 @@ export default function CSVManagerPage() {
                         {file && (
                             <CSVPreview
                                 file={file}
+                                selectedClient={selectedClient}
                                 onValidationComplete={handleValidationComplete}
                                 isSubmitting={isSubmitting}
                                 onSubmit={handleSubmitData}

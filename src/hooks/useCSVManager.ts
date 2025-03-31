@@ -10,7 +10,7 @@ import { mockCSVData } from "@/data/mock-csv-data";
 import { downloadCSV } from "@/lib/utils/csv-export";
 
 export function useCSVManager() {
-    const [mode, setMode] = useState<CSVManagerMode>(CSVManagerMode.DOWNLOAD);
+    const [mode, setMode] = useState<CSVManagerMode>(CSVManagerMode.UPLOAD);
     const [selectedClient, setSelectedClient] = useState<Client | null>(null);
     const [file, setFile] = useState<File | null>(null);
     const [data, setData] = useState<CSVRow[]>([]);
@@ -23,6 +23,12 @@ export function useCSVManager() {
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
+
+    // Thêm state cho dialog xác nhận thay đổi client
+    const [showClientChangeConfirm, setShowClientChangeConfirm] =
+        useState(false);
+    const [pendingClientChange, setPendingClientChange] =
+        useState<Client | null>(null);
 
     // Effect mới để load mock data khi ở chế độ Download
     useEffect(() => {
@@ -65,9 +71,19 @@ export function useCSVManager() {
         setCurrentPage(1);
     }, []);
 
-    const handleClientSelect = useCallback((client: Client | null) => {
-        setSelectedClient(client);
-    }, []);
+    const handleClientSelect = useCallback(
+        (client: Client | null) => {
+            // Nếu đã upload file CSV và đang ở chế độ UPLOAD, hiển thị cảnh báo
+            if (mode === CSVManagerMode.UPLOAD && file && data.length > 0) {
+                setPendingClientChange(client);
+                setShowClientChangeConfirm(true);
+            } else {
+                // Nếu không có file hoặc data, thay đổi client ngay lập tức
+                setSelectedClient(client);
+            }
+        },
+        [file, data.length, mode],
+    );
 
     const handleFileSelect = useCallback((selectedFile: File | null) => {
         setFile(selectedFile);
@@ -123,6 +139,24 @@ export function useCSVManager() {
         [data, filters, searchTerm],
     );
 
+    // Thêm hàm xử lý xác nhận thay đổi client
+    const handleConfirmClientChange = useCallback(() => {
+        setSelectedClient(pendingClientChange);
+        // Clear file và data
+        setFile(null);
+        setData([]);
+        setValidationErrors([]);
+        setIsValid(false);
+        // Đóng dialog
+        setShowClientChangeConfirm(false);
+    }, [pendingClientChange]);
+
+    // Thêm hàm hủy thay đổi client
+    const handleCancelClientChange = useCallback(() => {
+        setPendingClientChange(null);
+        setShowClientChangeConfirm(false);
+    }, []);
+
     return {
         mode,
         selectedClient,
@@ -135,6 +169,8 @@ export function useCSVManager() {
         searchTerm,
         currentPage,
         itemsPerPage,
+        showClientChangeConfirm,
+        pendingClientChange,
         handleModeChange,
         handleClientSelect,
         handleFileSelect,
@@ -146,6 +182,9 @@ export function useCSVManager() {
         handleItemsPerPageChange,
         handleSearch,
         handleExportCSV,
+        // Thêm handlers cho dialog xác nhận
+        handleConfirmClientChange,
+        handleCancelClientChange,
         // Giữ lại các setters để hỗ trợ các trường hợp khác
         setFilters,
         setSearchTerm,

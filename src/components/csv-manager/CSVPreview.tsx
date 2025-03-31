@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { CSVRow, ValidationError } from "@/types";
+import { Client, CSVRow, ValidationError } from "@/types";
 import { Switch } from "@headlessui/react";
 import {
     CheckCircleIcon,
@@ -14,6 +14,7 @@ import Papa from "papaparse";
 
 interface CSVPreviewProps {
     file: File | null;
+    selectedClient: Client | null;
     onValidationComplete: (isValid: boolean, data: CSVRow[]) => void;
     isSubmitting?: boolean;
     onSubmit?: () => void;
@@ -22,6 +23,7 @@ interface CSVPreviewProps {
 
 export default function CSVPreview({
     file,
+    selectedClient,
     onValidationComplete,
     isSubmitting = false,
     onSubmit,
@@ -114,6 +116,46 @@ export default function CSVPreview({
                                 });
                             }
                         });
+
+                        // Kiểm tra CID có khớp với Client ID đã chọn không
+                        if (
+                            selectedClient &&
+                            headers.includes("CID") &&
+                            row["CID"]
+                        ) {
+                            const cidValue = row["CID"];
+                            // Lấy 4 số đầu tiên từ CID
+                            const firstFourDigits = cidValue.split("-")[0];
+                            if (
+                                firstFourDigits &&
+                                firstFourDigits.length >= 4
+                            ) {
+                                // Thêm "00" vào đầu để tạo ID 6 chữ số
+                                const extractedId = "00" + firstFourDigits;
+
+                                // So sánh với ID của client đã chọn
+                                if (extractedId !== selectedClient.id) {
+                                    validationErrors.push({
+                                        rowIndex,
+                                        columnName: "CID",
+                                        message: `CIDはクライアントIDと一致しません。期待される値: ${selectedClient.id.slice(
+                                            2,
+                                        )}-xxx-xxx (CID does not match client ID. Expected: ${selectedClient.id.slice(
+                                            2,
+                                        )}-xxx-xxx)`,
+                                        value: cidValue,
+                                    });
+                                }
+                            } else {
+                                validationErrors.push({
+                                    rowIndex,
+                                    columnName: "CID",
+                                    message:
+                                        "CID形式が正しくありません。期待される形式: XXXX-XXX-XXX (Invalid CID format. Expected format: XXXX-XXX-XXX)",
+                                    value: cidValue,
+                                });
+                            }
+                        }
                     });
 
                     const isDataValid = validationErrors.length === 0;
@@ -146,7 +188,7 @@ export default function CSVPreview({
         };
 
         validateCSV();
-    }, [file, onValidationComplete]);
+    }, [file, selectedClient, onValidationComplete]);
 
     // Xử lý việc submit với xác nhận ghi đè
     const handleSubmit = () => {
@@ -355,6 +397,40 @@ export default function CSVPreview({
                     <h3 className="text-red-800 font-medium">
                         エラー概要 (Error Summary)
                     </h3>
+
+                    {/* Client CID validation message */}
+                    {selectedClient &&
+                        errors.some(e => e.columnName === "CID") && (
+                            <div className="mt-2 mb-4 p-3 bg-red-100 rounded-md border border-red-300">
+                                <div className="flex items-start">
+                                    <ExclamationCircleIcon className="h-5 w-5 text-red-600 mr-2 flex-shrink-0 mt-0.5" />
+                                    <div>
+                                        <p className="text-sm font-medium text-red-800">
+                                            クライアントIDとCIDの不一致 (Client
+                                            ID and CID mismatch)
+                                        </p>
+                                        <p className="text-xs text-red-700 mt-1">
+                                            選択されたクライアント:{" "}
+                                            {selectedClient.name} (ID:{" "}
+                                            {selectedClient.id})
+                                        </p>
+                                        <p className="text-xs text-red-700 mt-1">
+                                            CSVファイル内のCIDは、このクライアントのIDと一致する必要があります。CIDの最初の4桁が「
+                                            {selectedClient.id.slice(2)}
+                                            」で始まる必要があります。
+                                        </p>
+                                        <p className="text-xs text-red-700 mt-1">
+                                            (CIDs in the CSV file must match
+                                            this client&apos;s ID. The first 4
+                                            digits of CID should start with
+                                            &quot;
+                                            {selectedClient.id.slice(2)}&quot;)
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
                     <div className="mt-3 max-h-60 overflow-y-auto">
                         <table className="min-w-full divide-y divide-red-200">
                             <thead className="bg-red-100">
@@ -381,7 +457,14 @@ export default function CSVPreview({
                             </thead>
                             <tbody className="bg-red-50 divide-y divide-red-200">
                                 {errors.map((error, index) => (
-                                    <tr key={index}>
+                                    <tr
+                                        key={index}
+                                        className={
+                                            error.columnName === "CID"
+                                                ? "bg-red-100"
+                                                : ""
+                                        }
+                                    >
                                         <td className="px-4 py-2 whitespace-nowrap text-sm text-red-700">
                                             {error.rowIndex >= 0
                                                 ? error.rowIndex + 1
