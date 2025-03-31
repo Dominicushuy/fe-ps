@@ -33,22 +33,31 @@ export default function CSVPreview({
     const [hasColumnError, setHasColumnError] = useState(false);
     const [confirmOverwrite, setConfirmOverwrite] = useState(false);
 
-    // Các cột bắt buộc
+    // Tất cả các cột được yêu cầu trong file CSV (để kiểm tra header)
     const requiredColumns = [
         "Action",
         "媒体ID",
         "CID",
-        "ACCID",
-        "CPNID",
-        "CPN",
-        "ADGID",
-        "ADG",
-        "ADID",
-        "AD",
-        "KWID",
-        "パラメ発行ドラフト停",
-        "日付",
-        "処理結果",
+        "アカウントID",
+        "キャンペーンID",
+        "キャンペーン名",
+        "広告グループID",
+        "広告グループ名", 
+        "広告ID",
+        "キーワードID",
+        "パラメ発行済みURL",
+        "ドラフト停止日",
+    ];
+
+    // Chỉ những cột có giá trị bắt buộc mới cần kiểm tra ô trống
+    const requiredCellColumns = [
+        "Action",
+        "媒体ID",
+        "CID",
+        "アカウントID",
+        "キャンペーンID",
+        "キャンペーン名",
+        "パラメ発行済みURL",
     ];
 
     // Parse và validate file CSV
@@ -89,10 +98,10 @@ export default function CSVPreview({
                         });
                     }
 
-                    // Kiểm tra các ô trống
+                    // Kiểm tra các ô trống CHỈ trên các cột bắt buộc
                     parsedData.forEach((row, rowIndex) => {
-                        requiredColumns.forEach(col => {
-                            if (headers.includes(col) && row[col] === "") {
+                        requiredCellColumns.forEach(col => {
+                            if (headers.includes(col) && (!row[col] || row[col] === "")) {
                                 validationErrors.push({
                                     rowIndex,
                                     columnName: col,
@@ -267,13 +276,13 @@ export default function CSVPreview({
                                     key={header}
                                     scope="col"
                                     className={`px-4 py-3 text-left text-xs font-medium ${
-                                        requiredColumns.includes(header)
+                                        requiredCellColumns.includes(header)
                                             ? "text-blue-600"
                                             : "text-gray-500"
                                     } uppercase tracking-wider`}
                                 >
                                     {header}
-                                    {requiredColumns.includes(header) && " *"}
+                                    {requiredCellColumns.includes(header) && " *"}
                                 </th>
                             ))}
                         </tr>
@@ -310,7 +319,7 @@ export default function CSVPreview({
                                             }`}
                                         >
                                             {row[header] || (
-                                                <span className="text-red-500 italic">
+                                                <span className={`italic ${requiredCellColumns.includes(header) ? "text-red-500" : "text-gray-400"}`}>
                                                     Empty
                                                 </span>
                                             )}
@@ -399,8 +408,7 @@ export default function CSVPreview({
                             <div className="flex-grow">
                                 <div className="flex justify-between items-center">
                                     <h4 className="text-amber-800 font-medium">
-                                        データの上書きを確認 (Confirm data
-                                        overwrite)
+                                        パラメ重複チェック (Parame duplicated check)
                                     </h4>
                                     <Switch
                                         checked={confirmOverwrite}
@@ -412,7 +420,7 @@ export default function CSVPreview({
                                         } relative inline-flex h-6 w-12 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500`}
                                     >
                                         <span className="sr-only">
-                                            上書きを確認する (Confirm overwrite)
+                                            パラメ重複チェック確認 (Confirm parame check)
                                         </span>
                                         <span
                                             className={`${
@@ -424,17 +432,14 @@ export default function CSVPreview({
                                     </Switch>
                                 </div>
                                 <p className="text-sm text-amber-700 mt-2">
-                                    既存のデータを新しいデータで上書きすることを確認します。この操作は元に戻せません。
-                                    (I confirm that I want to overwrite existing
-                                    data with new data. This action cannot be
-                                    undone.)
+                                    パラメータの重複をチェックします。同じパラメータが存在する場合は警告します。
+                                    (Check for duplicate parameters. Will warn if the same parameter already exists.)
                                 </p>
                                 {confirmOverwrite && (
                                     <div className="mt-3 p-2 bg-amber-100 rounded border border-amber-300">
                                         <p className="text-sm text-amber-800 font-medium flex items-center">
                                             <CheckCircleIcon className="h-4 w-4 mr-1 text-amber-600" />
-                                            上書きが確認されました (Overwrite
-                                            confirmed)
+                                            重複チェック確認済み (Duplication check confirmed)
                                         </p>
                                     </div>
                                 )}

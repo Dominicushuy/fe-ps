@@ -11,22 +11,20 @@ export interface Client {
     name: string;
 }
 
-// Type cho dữ liệu CSV
+// Type cho dữ liệu CSV - đã cập nhật để phù hợp với template
 export interface CSVRow {
     Action: string;
     媒体ID: string;
     CID: string;
-    ACCID: string;
-    CPNID: string;
-    CPN: string;
-    ADGID: string;
-    ADG: string;
-    ADID: string;
-    AD: string;
-    KWID: string;
-    パラメ発行ドラフト停: string;
-    日付: string;
-    処理結果: string;
+    アカウントID: string;
+    キャンペーンID: string;
+    キャンペーン名: string;
+    広告グループID: string;
+    広告グループ名: string;
+    広告ID: string;
+    キーワードID: string;
+    パラメ発行済みURL: string;
+    ドラフト停止日: string;
     [key: string]: string;
 }
 
@@ -35,6 +33,7 @@ export interface ValidationError {
     rowIndex: number;
     columnName: string;
     message: string;
+    value?: string;
 }
 
 // Type cho Filter
