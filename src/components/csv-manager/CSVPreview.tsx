@@ -42,7 +42,7 @@ export default function CSVPreview({
         "キャンペーンID",
         "キャンペーン名",
         "広告グループID",
-        "広告グループ名", 
+        "広告グループ名",
         "広告ID",
         "キーワードID",
         "パラメ発行済みURL",
@@ -101,7 +101,10 @@ export default function CSVPreview({
                     // Kiểm tra các ô trống CHỈ trên các cột bắt buộc
                     parsedData.forEach((row, rowIndex) => {
                         requiredCellColumns.forEach(col => {
-                            if (headers.includes(col) && (!row[col] || row[col] === "")) {
+                            if (
+                                headers.includes(col) &&
+                                (!row[col] || row[col] === "")
+                            ) {
                                 validationErrors.push({
                                     rowIndex,
                                     columnName: col,
@@ -267,7 +270,7 @@ export default function CSVPreview({
                         <tr>
                             <th
                                 scope="col"
-                                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
                             >
                                 Row
                             </th>
@@ -276,13 +279,13 @@ export default function CSVPreview({
                                     key={header}
                                     scope="col"
                                     className={`px-4 py-3 text-left text-xs font-medium ${
-                                        requiredCellColumns.includes(header)
+                                        requiredColumns.includes(header)
                                             ? "text-blue-600"
                                             : "text-gray-500"
-                                    } uppercase tracking-wider`}
+                                    } uppercase tracking-wider whitespace-nowrap`}
                                 >
                                     {header}
-                                    {requiredCellColumns.includes(header) && " *"}
+                                    {requiredColumns.includes(header) && " *"}
                                 </th>
                             ))}
                         </tr>
@@ -319,7 +322,7 @@ export default function CSVPreview({
                                             }`}
                                         >
                                             {row[header] || (
-                                                <span className={`italic ${requiredCellColumns.includes(header) ? "text-red-500" : "text-gray-400"}`}>
+                                                <span className="text-red-500 italic">
                                                     Empty
                                                 </span>
                                             )}
@@ -408,7 +411,8 @@ export default function CSVPreview({
                             <div className="flex-grow">
                                 <div className="flex justify-between items-center">
                                     <h4 className="text-amber-800 font-medium">
-                                        パラメ重複チェック (Parame duplicated check)
+                                        パラメ重複チェック (Parame duplicated
+                                        check)
                                     </h4>
                                     <Switch
                                         checked={confirmOverwrite}
@@ -420,7 +424,8 @@ export default function CSVPreview({
                                         } relative inline-flex h-6 w-12 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500`}
                                     >
                                         <span className="sr-only">
-                                            パラメ重複チェック確認 (Confirm parame check)
+                                            パラメ重複チェック確認 (Confirm
+                                            parame check)
                                         </span>
                                         <span
                                             className={`${
@@ -433,13 +438,15 @@ export default function CSVPreview({
                                 </div>
                                 <p className="text-sm text-amber-700 mt-2">
                                     パラメータの重複をチェックします。同じパラメータが存在する場合は警告します。
-                                    (Check for duplicate parameters. Will warn if the same parameter already exists.)
+                                    (Check for duplicate parameters. Will warn
+                                    if the same parameter already exists.)
                                 </p>
                                 {confirmOverwrite && (
                                     <div className="mt-3 p-2 bg-amber-100 rounded border border-amber-300">
                                         <p className="text-sm text-amber-800 font-medium flex items-center">
                                             <CheckCircleIcon className="h-4 w-4 mr-1 text-amber-600" />
-                                            重複チェック確認済み (Duplication check confirmed)
+                                            重複チェック確認済み (Duplication
+                                            check confirmed)
                                         </p>
                                     </div>
                                 )}
@@ -454,11 +461,11 @@ export default function CSVPreview({
                         type="button"
                         className={`inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white 
                         ${
-                            isValid && confirmOverwrite
+                            isValid
                                 ? "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
                                 : "bg-gray-400 cursor-not-allowed"
                         } focus:outline-none focus:ring-2 focus:ring-offset-2`}
-                        disabled={!isValid || !confirmOverwrite || isSubmitting}
+                        disabled={!isValid || isSubmitting}
                         onClick={handleSubmit}
                     >
                         {isSubmitting ? (

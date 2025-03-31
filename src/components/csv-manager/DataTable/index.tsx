@@ -116,7 +116,9 @@ export default function DataTable({
                                         onClick={() => requestSort(column)}
                                     >
                                         <div className="group flex items-center">
-                                            <span>{column}</span>
+                                            <span className="whitespace-nowrap">
+                                                {column}
+                                            </span>
                                             <span className="ml-2 flex-none rounded text-primary-500 group-hover:visible">
                                                 {sortConfig.key === column ? (
                                                     sortConfig.direction ===
