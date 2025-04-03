@@ -508,8 +508,8 @@ export default function CSVPreview({
                                         } relative inline-flex h-6 w-12 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500`}
                                     >
                                         <span className="sr-only">
-                                            パラメ重複チェック確認 (Confirm
-                                            parame check)
+                                            パラメ重複チェック確認 (Parame
+                                            duplicated check)
                                         </span>
                                         <span
                                             className={`${

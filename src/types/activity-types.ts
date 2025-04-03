@@ -11,6 +11,8 @@ export interface Activity {
     status: ActivityStatus;
     user: string;
     type: ActivityType;
+    s3Link?: string; // Link S3 cho các hoạt động Download đã hoàn thành
+    filename?: string; // Tên file
 }
 
 export type DateFilterOption =

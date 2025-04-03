@@ -11,6 +11,8 @@ import {
     ExclamationCircleIcon,
     ArrowDownTrayIcon,
     ArrowUpTrayIcon,
+    DocumentArrowDownIcon,
+    ExclamationTriangleIcon
 } from "@heroicons/react/24/outline";
 
 interface ActivityTableProps {
@@ -128,6 +130,25 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
             default:
                 return status;
         }
+    };
+
+    // Handle download button click
+    const handleDownload = (activity: Activity) => {
+        if (!activity.s3Link) {
+            alert('ダウンロードリンクが利用できません。(Download link unavailable.)');
+            return;
+        }
+        
+        // In a real application, this would trigger the download process
+        console.log(`Downloading from S3: ${activity.s3Link}`);
+        
+        // Create a temporary anchor element to trigger download
+        const a = document.createElement('a');
+        a.href = activity.s3Link;
+        a.download = activity.filename || `file-${activity.id}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     };
 
     // No data message
@@ -275,6 +296,37 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                                         </span>
                                     </div>
                                 </th>
+                                {/* File Name column */}
+                                <th
+                                    scope="col"
+                                    className="px-3 py-3.5 text-left text-sm font-semibold text-primary-900 cursor-pointer hover:bg-primary-100 transition-colors"
+                                    onClick={() => requestSort("filename" as any)}
+                                >
+                                    <div className="group flex items-center">
+                                        <span>File</span>
+                                        <span className="ml-2 flex-none rounded text-primary-500">
+                                            {sortConfig.key === "filename" ? (
+                                                sortConfig.direction ===
+                                                "ascending" ? (
+                                                    <ChevronUpIcon className="h-4 w-4" />
+                                                ) : (
+                                                    <ChevronDownIcon className="h-4 w-4" />
+                                                )
+                                            ) : (
+                                                <div className="h-4 w-4" />
+                                            )}
+                                        </span>
+                                    </div>
+                                </th>
+                                {/* Actions column */}
+                                <th
+                                    scope="col"
+                                    className="px-3 py-3.5 text-left text-sm font-semibold text-primary-900"
+                                >
+                                    <div className="group flex items-center">
+                                        <span>Actions</span>
+                                    </div>
+                                </th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200 bg-white">
@@ -321,6 +373,52 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                                     </td>
                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                         {activity.user}
+                                    </td>
+                                    {/* File name cell */}
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        {activity.type === "Download" && activity.filename ? (
+                                            <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded truncate max-w-[150px] inline-block">
+                                                {activity.filename}
+                                            </span>
+                                        ) : (
+                                            <span className="text-gray-400">-</span>
+                                        )}
+                                    </td>
+                                    {/* Actions cell */}
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        {activity.type === "Download" && activity.status === "Success" ? (
+                                            activity.s3Link ? (
+                                                <button
+                                                    onClick={() => handleDownload(activity)}
+                                                    className="inline-flex items-center rounded-md bg-primary-50 px-2.5 py-1.5 text-xs font-medium text-primary-700 hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1 transition-colors"
+                                                    title="ファイルをダウンロード (Download file)"
+                                                >
+                                                    <DocumentArrowDownIcon className="h-4 w-4 mr-1" />
+                                                    ダウンロード
+                                                </button>
+                                            ) : (
+                                                <span className="inline-flex items-center text-xs text-amber-600">
+                                                    <ExclamationTriangleIcon className="h-4 w-4 mr-1" />
+                                                    リンク切れ
+                                                </span>
+                                            )
+                                        ) : activity.type === "Download" && activity.status === "Failed" ? (
+                                            <button
+                                                onClick={() => alert('処理に失敗しました。後でもう一度お試しください。(The process failed. Please try again later.)')}
+                                                className="inline-flex items-center rounded-md bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-colors"
+                                                title="ダウンロードを再試行 (Retry download)"
+                                            >
+                                                <DocumentArrowDownIcon className="h-4 w-4 mr-1" />
+                                                再試行
+                                            </button>
+                                        ) : activity.type === "Download" && activity.status === "Processing" ? (
+                                            <span className="inline-flex items-center text-xs text-blue-500">
+                                                <ClockIcon className="h-4 w-4 mr-1 animate-spin" />
+                                                処理中...
+                                            </span>
+                                        ) : (
+                                            <span className="text-gray-400 text-xs">-</span>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
