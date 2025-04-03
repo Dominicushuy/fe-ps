@@ -22,6 +22,7 @@ import {
     XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { mockClients } from "@/data/mock-clients";
+import { Activity } from "@/types";
 
 export default function ActivityLogPage() {
     const searchParams = useSearchParams();
@@ -216,7 +217,9 @@ export default function ActivityLogPage() {
 
                     {/* Activity Table */}
                     <div className="mb-4">
-                        <ActivityTable activities={paginatedData} />
+                        <ActivityTable
+                            activities={paginatedData as Activity[]}
+                        />
                     </div>
 
                     {/* Pagination */}

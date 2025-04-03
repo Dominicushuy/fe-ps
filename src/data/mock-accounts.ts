@@ -53,6 +53,7 @@ export const mockAccounts: MediaAccount[] = mockMediaList.flatMap(media => {
         accounts.push({
             id: `acc-${media.id}-${i}`,
             mediaId: media.id,
+            mediaName: media.name,
             accountId: accountId,
             name: `${media.name} ${accountType}`,
         });
