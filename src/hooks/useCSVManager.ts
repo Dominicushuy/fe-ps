@@ -1,3 +1,5 @@
+// src/hooks/useCSVManager.ts
+
 import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
@@ -5,11 +7,16 @@ import {
     CSVManagerMode,
     CSVRow,
     Client,
+    MediaAccount,
+    DataLayer,
     ValidationError,
     ColumnFilter,
 } from "@/types";
 import { mockCSVData } from "@/data/mock-csv-data";
 import { downloadCSV } from "@/lib/utils/csv-export";
+
+// Define all available data layers
+const ALL_DATA_LAYERS: DataLayer[] = ["Campaign", "Adgroup", "Ad", "Keyword"];
 
 export function useCSVManager() {
     const router = useRouter();
@@ -27,6 +34,17 @@ export function useCSVManager() {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
+    // New states for account, and data layer filters
+    // Removed selectedMedia state
+    const [selectedAccounts, setSelectedAccounts] = useState<MediaAccount[]>(
+        [],
+    );
+
+    // Initialize with all data layers selected
+    const [selectedDataLayers, setSelectedDataLayers] = useState<DataLayer[]>([
+        ...ALL_DATA_LAYERS,
+    ]);
+
     // Thêm state cho dialog xác nhận thay đổi client
     const [showClientChangeConfirm, setShowClientChangeConfirm] =
         useState(false);
@@ -41,8 +59,23 @@ export function useCSVManager() {
         if (mode === CSVManagerMode.DOWNLOAD) {
             setData(mockCSVData);
             setIsValid(true);
+
+            // Ensure all data layers are selected when switching to Download mode
+            if (selectedDataLayers.length === 0) {
+                setSelectedDataLayers([...ALL_DATA_LAYERS]);
+            }
         }
-    }, [mode]);
+    }, [mode, selectedDataLayers.length]);
+
+    // Handler for account selection
+    const handleAccountSelect = useCallback((accounts: MediaAccount[]) => {
+        setSelectedAccounts(accounts);
+    }, []);
+
+    // Handler for data layer selection
+    const handleDataLayerSelect = useCallback((layers: DataLayer[]) => {
+        setSelectedDataLayers(layers);
+    }, []);
 
     // Các hàm xử lý mới
     // Handler cho việc thay đổi trang
@@ -75,6 +108,10 @@ export function useCSVManager() {
         setFilters([]);
         setSearchTerm("");
         setCurrentPage(1);
+
+        // Clear account selection, but keep all data layers selected
+        setSelectedAccounts([]);
+        setSelectedDataLayers([...ALL_DATA_LAYERS]);
     }, []);
 
     const handleClientSelect = useCallback(
@@ -129,12 +166,11 @@ export function useCSVManager() {
         setTimeout(() => {
             // Trong trường hợp thực tế, đây là nơi bạn sẽ gửi dữ liệu lên server
             console.log("Submitting data:", data);
+            console.log("Selected accounts:", selectedAccounts);
+            console.log("Selected data layers:", selectedDataLayers);
 
             // Clear file và data sau khi submit thành công
             setFile(null);
-
-            // Giữ lại data trong state để hiển thị thông báo thành công (optional)
-            // setData([...data]);
 
             // Hiển thị thông báo thành công với toast
             toast.success(
@@ -154,7 +190,7 @@ export function useCSVManager() {
 
             setIsSubmitting(false);
         }, 1500);
-    }, [isValid, data]);
+    }, [isValid, data, selectedAccounts, selectedDataLayers]);
 
     // Hàm xử lý khi xác nhận chuyển hướng sang activity-log
     const handleNavigateToActivityLog = useCallback(() => {
@@ -217,6 +253,8 @@ export function useCSVManager() {
         showClientChangeConfirm,
         pendingClientChange,
         showNavigationConfirm,
+        selectedAccounts,
+        selectedDataLayers,
         handleModeChange,
         handleClientSelect,
         handleFileSelect,
@@ -234,6 +272,9 @@ export function useCSVManager() {
         // Thêm handlers cho navigation dialog
         handleNavigateToActivityLog,
         handleCloseNavigationDialog,
+        // Handlers for new filters
+        handleAccountSelect,
+        handleDataLayerSelect,
         // Giữ lại các setters để hỗ trợ các trường hợp khác
         setFilters,
         setSearchTerm,

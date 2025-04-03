@@ -28,7 +28,7 @@ export default function FilterPanel({
     onFilterChange,
     columns,
 }: FilterPanelProps) {
-    const [isExpanded, setIsExpanded] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(true);
 
     // Thêm một filter mới
     const handleAddFilter = () => {

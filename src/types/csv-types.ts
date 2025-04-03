@@ -11,6 +11,24 @@ export interface Client {
     name: string;
 }
 
+// Media type (new)
+export interface Media {
+    id: string;
+    name: string;
+}
+
+// Account type (expanded from existing Client type)
+export interface MediaAccount {
+    id: string;
+    mediaId: string;
+    mediaName: string;
+    accountId: string;
+    name: string;
+}
+
+// Data layer type (for Campaign, Adgroup, Ad, Keyword filter)
+export type DataLayer = "Campaign" | "Adgroup" | "Ad" | "Keyword";
+
 // Type cho dữ liệu CSV - đã cập nhật để phù hợp với template
 export interface CSVRow {
     Action: string;
@@ -60,6 +78,7 @@ export interface ColumnFilter {
     value: string;
 }
 
+// Updated CSVState with new filter states
 export interface CSVState {
     mode: CSVManagerMode;
     selectedClient: Client | null;
@@ -71,13 +90,11 @@ export interface CSVState {
     searchTerm: string;
     currentPage: number;
     itemsPerPage: number;
-}
 
-export interface ValidationError {
-    rowIndex: number;
-    columnName: string;
-    message: string;
-    value?: string;
+    // New properties
+    selectedMedia: Media[];
+    selectedAccounts: MediaAccount[];
+    selectedDataLayers: DataLayer[];
 }
 
 export interface CSVValidationResult {
@@ -86,12 +103,4 @@ export interface CSVValidationResult {
     data: CSVRow[];
     hasColumnError: boolean;
     hasCellError: boolean;
-}
-
-// Cấu trúc của một bộ lọc
-export interface ColumnFilter {
-    id: string; // Unique id for each filter
-    columnName: string;
-    operator: FilterOperator;
-    value: string;
 }
