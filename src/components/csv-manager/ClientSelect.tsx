@@ -69,6 +69,9 @@ export default function ClientSelect({
                     value={selectedOption}
                     onChange={(option: ClientOption | null) => {
                         onClientSelect(option ? option.client : null);
+                        if (!option) {
+                            setInputValue("");
+                        }
                     }}
                     options={options}
                     isDisabled={disabled}
@@ -80,7 +83,7 @@ export default function ClientSelect({
                         "検索結果がありません (No results found)"
                     }
                     // Control input value
-                    inputValue={inputValue}
+                    // inputValue={inputValue}
                     onInputChange={(newValue, actionMeta) => {
                         // Only update when user actually types or deletes content
                         if (actionMeta.action === "input-change") {

@@ -8,9 +8,14 @@ export async function fetchClients(
 ): Promise<PaginatedResponse<CaClient>> {
     const queryParams = new URLSearchParams();
 
-    if (params?.search) queryParams.append("search", params.search);
-    if (params?.ordering) queryParams.append("ordering", params.ordering);
-    if (params?.page) queryParams.append("page", params.page.toString());
+    // console.log("params", params);
+
+    if (params?.search !== undefined)
+        queryParams.append("search", params.search || "");
+    if (params?.ordering !== undefined)
+        queryParams.append("ordering", params.ordering || "");
+    if (params?.page !== undefined)
+        queryParams.append("page", params.page.toString() || "1");
 
     const limit = params?.limit || 20;
     queryParams.append("limit", limit.toString());
