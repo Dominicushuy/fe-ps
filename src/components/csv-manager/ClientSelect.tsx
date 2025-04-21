@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react";
+// src/components/csv-manager/ClientSelect.tsx
+import React, { useState, useMemo } from "react";
 import Select from "react-select";
 import { useDebounce } from "use-debounce";
 import { Client } from "@/types";
-import { fetchClients } from "@/lib/api/client";
-import { UserCircleIcon } from "@heroicons/react/24/outline";
-import { XMarkIcon } from "@heroicons/react/24/outline"; // Import XMarkIcon
+import { UserCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useClients } from "@/hooks/useClients";
 
 interface ClientSelectProps {
     selectedClient: Client | null;
@@ -28,44 +28,23 @@ export default function ClientSelect({
     const [inputValue, setInputValue] = useState("");
     // Debounce search (500ms)
     const [debouncedInputValue] = useDebounce(inputValue, 500);
-    // State to store options list
-    const [options, setOptions] = useState<ClientOption[]>([]);
-    // State to control loading status
-    const [isLoading, setIsLoading] = useState(false);
 
-    // Load clients list when input changes
-    useEffect(() => {
-        const loadClients = async () => {
-            setIsLoading(true);
-            try {
-                const response = await fetchClients({
-                    search: debouncedInputValue,
-                    limit: 20,
-                });
+    // Usar el hook useClients para obtener los datos
+    const { clients, isLoading } = useClients({
+        search: debouncedInputValue,
+        limit: 20,
+    });
 
-                const clientOptions = response.results.map(client => ({
-                    value: client.client_id,
-                    label: `${client.client_id} - ${client.client_name}`,
-                    client: {
-                        id: client.client_id,
-                        accountId: client.client_id,
-                        name: client.client_name,
-                    } as Client,
-                }));
+    // Convertir los clientes en opciones para el select
+    const options = useMemo(() => {
+        return clients.map(client => ({
+            value: client.id,
+            label: `${client.accountId} - ${client.name}`,
+            client: client,
+        }));
+    }, [clients]);
 
-                setOptions(clientOptions);
-            } catch (error) {
-                console.error("Error loading clients:", error);
-                setOptions([]);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        loadClients();
-    }, [debouncedInputValue]);
-
-    // Convert selected client to option format
+    // Convertir el cliente seleccionado a formato de opción
     const selectedOption = selectedClient
         ? {
               value: selectedClient.id,

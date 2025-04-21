@@ -12,7 +12,6 @@ export async function fetchClients(
     if (params?.ordering) queryParams.append("ordering", params.ordering);
     if (params?.page) queryParams.append("page", params.page.toString());
 
-    // Mặc định limit là 9999
     const limit = params?.limit || 20;
     queryParams.append("limit", limit.toString());
 

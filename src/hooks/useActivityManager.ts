@@ -1,6 +1,4 @@
-// /hooks/useActivityManager.ts
-
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { Client } from "@/types";
 import {
     ActivityFilters,
@@ -9,9 +7,11 @@ import {
     ActivityType,
 } from "@/types/activity-types";
 import { mockActivities } from "@/data/mock-activities";
+import { useClients } from "@/hooks/useClients";
 
 export const useActivityManager = () => {
-    // State for filters
+    const { clients } = useClients({ limit: 500 });
+
     const [filters, setFilters] = useState<ActivityFilters>({
         client: null,
         dateOption: "Last7Days",
@@ -21,22 +21,29 @@ export const useActivityManager = () => {
         status: "All",
     });
 
-    // State for pagination
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
-    // Filtered data based on filters
-    const filteredData = useMemo(() => {
-        let result = [...mockActivities];
+    const activities = useMemo(() => {
+        if (clients.length === 0) return mockActivities;
 
-        // Filter by client
+        return mockActivities.map(activity => {
+            const matchingClient =
+                clients.find(c => c.id === activity.client.id) ||
+                activity.client;
+            return { ...activity, client: matchingClient };
+        });
+    }, [clients]);
+
+    const filteredData = useMemo(() => {
+        let result = [...activities];
+
         if (filters.client) {
             result = result.filter(
                 activity => activity.client.id === filters.client?.id,
             );
         }
 
-        // Filter by date
         const now = new Date();
         const today = new Date(
             now.getFullYear(),
@@ -90,12 +97,10 @@ export const useActivityManager = () => {
                 break;
         }
 
-        // Filter by type
         if (filters.type !== "All") {
             result = result.filter(activity => activity.type === filters.type);
         }
 
-        // Filter by status
         if (filters.status !== "All") {
             result = result.filter(
                 activity => activity.status === filters.status,
@@ -103,60 +108,60 @@ export const useActivityManager = () => {
         }
 
         return result;
-    }, [filters]);
+    }, [filters, activities]);
 
-    // Paginated data
     const paginatedData = useMemo(() => {
         const startIndex = (currentPage - 1) * itemsPerPage;
         return filteredData.slice(startIndex, startIndex + itemsPerPage);
     }, [filteredData, currentPage, itemsPerPage]);
 
-    // Reset to first page when filters change
     useEffect(() => {
         setCurrentPage(1);
     }, [filters]);
 
-    // Handlers
-    const handleClientSelect = (client: Client | null) => {
+    const handleClientSelect = useCallback((client: Client | null) => {
         setFilters(prev => ({ ...prev, client }));
-    };
+    }, []);
 
-    const handleDateOptionChange = (dateOption: DateFilterOption) => {
-        setFilters(prev => ({ ...prev, dateOption }));
-    };
+    const handleDateOptionChange = useCallback(
+        (dateOption: DateFilterOption) => {
+            setFilters(prev => ({ ...prev, dateOption }));
+        },
+        [],
+    );
 
-    const handleCustomDateChange = (
-        startDate: Date | null,
-        endDate: Date | null,
-    ) => {
-        setFilters(prev => ({
-            ...prev,
-            customStartDate: startDate,
-            customEndDate: endDate,
-            dateOption: "Custom",
-        }));
-    };
+    const handleCustomDateChange = useCallback(
+        (startDate: Date | null, endDate: Date | null) => {
+            setFilters(prev => ({
+                ...prev,
+                customStartDate: startDate,
+                customEndDate: endDate,
+                dateOption: "Custom",
+            }));
+        },
+        [],
+    );
 
-    const handleTypeChange = (type: ActivityType | "All") => {
+    const handleTypeChange = useCallback((type: ActivityType | "All") => {
         setFilters(prev => ({ ...prev, type }));
-    };
+    }, []);
 
-    const handleStatusChange = (status: ActivityStatus | "All") => {
+    const handleStatusChange = useCallback((status: ActivityStatus | "All") => {
         setFilters(prev => ({ ...prev, status }));
-    };
+    }, []);
 
-    const handlePageChange = (page: number) => {
+    const handlePageChange = useCallback((page: number) => {
         setCurrentPage(page);
-    };
+    }, []);
 
-    const handleItemsPerPageChange = (items: number) => {
+    const handleItemsPerPageChange = useCallback((items: number) => {
         setItemsPerPage(items);
         setCurrentPage(1);
-    };
+    }, []);
 
     return {
         filters,
-        filteredData, // Thêm filteredData để truy cập trước khi phân trang
+        filteredData,
         paginatedData,
         currentPage,
         itemsPerPage,
