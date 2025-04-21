@@ -124,25 +124,18 @@ export default function CSVPreview({
                             row["CID"]
                         ) {
                             const cidValue = row["CID"];
-                            // Lấy 4 số đầu tiên từ CID
-                            const firstFourDigits = cidValue.split("-")[0];
-                            if (
-                                firstFourDigits &&
-                                firstFourDigits.length >= 4
-                            ) {
-                                // Thêm "00" vào đầu để tạo ID 6 chữ số
-                                const extractedId = "00" + firstFourDigits;
+                            // Lấy phần đầu tiên của CID (trước dấu -)
+                            const firstChunk = cidValue.split("-")[0];
 
-                                // So sánh với ID của client đã chọn
-                                if (extractedId !== selectedClient.id) {
+                            if (firstChunk) {
+                                // Compare directly with the client ID, without any assumptions about format
+                                if (firstChunk === selectedClient.id) {
+                                    // CID matches client ID - no error
+                                } else {
                                     validationErrors.push({
                                         rowIndex,
                                         columnName: "CID",
-                                        message: `CIDはクライアントIDと一致しません。期待される値: ${selectedClient.id.slice(
-                                            2,
-                                        )}-xxx-xxx (CID does not match client ID. Expected: ${selectedClient.id.slice(
-                                            2,
-                                        )}-xxx-xxx)`,
+                                        message: `CIDはクライアントIDと一致しません。期待される値: ${selectedClient.id}-xxx-xxx (CID does not match client ID. Expected: ${selectedClient.id}-xxx-xxx)`,
                                         value: cidValue,
                                     });
                                 }
@@ -150,8 +143,7 @@ export default function CSVPreview({
                                 validationErrors.push({
                                     rowIndex,
                                     columnName: "CID",
-                                    message:
-                                        "CID形式が正しくありません。期待される形式: XXXX-XXX-XXX (Invalid CID format. Expected format: XXXX-XXX-XXX)",
+                                    message: `CID形式が正しくありません。期待される形式: ${selectedClient.id}-XXX-XXX (Invalid CID format. Expected format: ${selectedClient.id}-XXX-XXX)`,
                                     value: cidValue,
                                 });
                             }
