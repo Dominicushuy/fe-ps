@@ -1,3 +1,5 @@
+// src/app/parameter-storage/activity-log/page.tsx
+
 "use client";
 
 import React, { useState, useEffect } from "react";
@@ -17,6 +19,7 @@ import {
     ArrowUpTrayIcon,
     CheckCircleIcon,
     ClockIcon,
+    XCircleIcon,
     ExclamationCircleIcon,
     AdjustmentsHorizontalIcon,
     XMarkIcon,
@@ -87,101 +90,139 @@ export default function ActivityLogPage() {
                             {showFilters ? (
                                 <>
                                     <XMarkIcon className="h-5 w-5 mr-2 text-gray-500" />
-                                    Hide Filters
+                                    フィルターを閉じる (Hide Filters)
                                 </>
                             ) : (
                                 <>
                                     <FunnelIcon className="h-5 w-5 mr-2 text-gray-500" />
-                                    Show Filters
+                                    フィルターを表示 (Show Filters)
                                 </>
                             )}
                         </button>
                     </div>
 
-                    {/* Filter container - responsive */}
+                    {/* Filter container - redesigned with tabs and better organization */}
                     <div
                         className={`${
                             showFilters ? "block" : "hidden"
                         } md:block bg-gray-50 p-4 rounded-lg mb-6`}
                     >
-                        <div className="flex items-center mb-3">
-                            <AdjustmentsHorizontalIcon className="h-5 w-5 text-primary-600 mr-2" />
-                            <h3 className="text-base font-medium text-primary-900">
-                                フィルター (Filters)
-                            </h3>
+                        <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center">
+                                <AdjustmentsHorizontalIcon className="h-5 w-5 text-primary-600 mr-2" />
+                                <h3 className="text-base font-medium text-primary-900">
+                                    フィルター (Filters)
+                                </h3>
+                            </div>
+
+                            {/* Clear all filters button */}
+                            <button
+                                className="text-xs text-gray-500 hover:text-red-500 flex items-center"
+                                onClick={() => {
+                                    handleClientSelect(null);
+                                    handleDateOptionChange("Last7Days");
+                                    handleTypeChange("All");
+                                    handleStatusChange("All");
+                                }}
+                            >
+                                <XMarkIcon className="h-3 w-3 mr-1" />
+                                すべてクリア (Clear All)
+                            </button>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            {/* ClientSelect */}
-                            <div>
-                                <ClientSelect
-                                    selectedClient={filters.client}
-                                    onClientSelect={handleClientSelect}
-                                />
+                        {/* Two-column layout for filters on larger screens */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {/* Left column - Client and Date Range */}
+                            <div className="space-y-4">
+                                {/* ClientSelect */}
+                                <div className="bg-white p-3 rounded-md border border-gray-200 shadow-sm">
+                                    <ClientSelect
+                                        selectedClient={filters.client}
+                                        onClientSelect={handleClientSelect}
+                                    />
+                                </div>
+
+                                {/* DateRangeFilter */}
+                                <div className="bg-white p-3 rounded-md border border-gray-200 shadow-sm">
+                                    <DateRangeFilter
+                                        dateOption={filters.dateOption}
+                                        customStartDate={
+                                            filters.customStartDate
+                                        }
+                                        customEndDate={filters.customEndDate}
+                                        onDateOptionChange={
+                                            handleDateOptionChange
+                                        }
+                                        onCustomDateChange={
+                                            handleCustomDateChange
+                                        }
+                                    />
+                                </div>
                             </div>
 
-                            {/* DateRangeFilter */}
-                            <div>
-                                <DateRangeFilter
-                                    dateOption={filters.dateOption}
-                                    customStartDate={filters.customStartDate}
-                                    customEndDate={filters.customEndDate}
-                                    onDateOptionChange={handleDateOptionChange}
-                                    onCustomDateChange={handleCustomDateChange}
-                                />
-                            </div>
+                            {/* Right column - Type and Status */}
+                            <div className="space-y-4">
+                                {/* TypeFilter */}
+                                <div className="bg-white p-3 rounded-md border border-gray-200 shadow-sm">
+                                    <TypeFilter
+                                        selectedType={filters.type}
+                                        onTypeChange={handleTypeChange}
+                                    />
+                                </div>
 
-                            {/* TypeFilter */}
-                            <div>
-                                <TypeFilter
-                                    selectedType={filters.type}
-                                    onTypeChange={handleTypeChange}
-                                />
-                            </div>
-
-                            {/* StatusFilter */}
-                            <div>
-                                <StatusFilter
-                                    selectedStatus={filters.status}
-                                    onStatusChange={handleStatusChange}
-                                />
+                                {/* StatusFilter - Redesigned to use a more compact layout */}
+                                <div className="bg-white p-3 rounded-md border border-gray-200 shadow-sm">
+                                    <StatusFilter
+                                        selectedStatus={filters.status}
+                                        onStatusChange={handleStatusChange}
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Active Filters Summary */}
-                    <div className="mb-6">
-                        <div className="flex flex-wrap gap-2 items-center mb-2">
-                            <span className="text-sm font-medium text-gray-700">
-                                Applied Filters:
-                            </span>
+                    {/* Active Filters Summary - Horizontal chips */}
+                    <div className="mb-6 bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
+                        <h4 className="text-sm font-medium text-gray-700 mb-2">
+                            適用フィルター (Applied Filters)
+                        </h4>
 
-                            {filters.client ? (
-                                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
-                                    Client: {filters.client.name}
-                                </span>
-                            ) : (
-                                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                                    Client: All
-                                </span>
-                            )}
+                        <div className="flex flex-wrap gap-2 items-center">
+                            {/* Client filter chip */}
+                            <div
+                                className={`px-3 py-1.5 rounded-full text-xs font-medium 
+                                ${
+                                    filters.client
+                                        ? "bg-primary-100 text-primary-800"
+                                        : "bg-gray-100 text-gray-700"
+                                }`}
+                            >
+                                <span className="mr-1">👤</span>
+                                Client:{" "}
+                                {filters.client ? filters.client.name : "All"}
+                            </div>
 
-                            <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                <CalendarIcon className="h-3 w-3 mr-1" />
-                                {filters.dateOption}
+                            {/* Date filter chip */}
+                            <div className="bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-xs font-medium">
+                                <CalendarIcon className="h-3 w-3 mr-1 inline" />
                                 {filters.dateOption === "Custom" &&
-                                    filters.customStartDate &&
-                                    ` (${filters.customStartDate.toLocaleDateString()} - ${
-                                        filters.customEndDate?.toLocaleDateString() ||
-                                        "Now"
-                                    })`}
-                            </span>
+                                filters.customStartDate
+                                    ? `${filters.customStartDate.toLocaleDateString()} - ${
+                                          filters.customEndDate?.toLocaleDateString() ||
+                                          "Now"
+                                      }`
+                                    : filters.dateOption}
+                            </div>
 
-                            <span
-                                className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
+                            {/* Type filter chip */}
+                            <div
+                                className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center
+                                ${
                                     filters.type !== "All"
-                                        ? "bg-purple-100 text-purple-800"
-                                        : "bg-gray-100 text-gray-800"
+                                        ? filters.type === "Download"
+                                            ? "bg-purple-100 text-purple-800"
+                                            : "bg-indigo-100 text-indigo-800"
+                                        : "bg-gray-100 text-gray-700"
                                 }`}
                             >
                                 {filters.type === "Download" ? (
@@ -190,32 +231,42 @@ export default function ActivityLogPage() {
                                     <ArrowUpTrayIcon className="h-3 w-3 mr-1" />
                                 ) : null}
                                 Type: {filters.type}
-                            </span>
+                            </div>
 
-                            <span
-                                className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${
-                                    filters.status === "Success"
+                            {/* Status filter chip */}
+                            <div
+                                className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center
+                                ${
+                                    filters.status === "done"
                                         ? "bg-green-100 text-green-800"
-                                        : filters.status === "Processing"
+                                        : filters.status === "processing"
+                                        ? "bg-blue-100 text-blue-800"
+                                        : filters.status === "waiting"
                                         ? "bg-yellow-100 text-yellow-800"
-                                        : filters.status === "Failed"
+                                        : filters.status === "invalid"
+                                        ? "bg-orange-100 text-orange-800"
+                                        : filters.status === "error"
                                         ? "bg-red-100 text-red-800"
-                                        : "bg-gray-100 text-gray-800"
+                                        : "bg-gray-100 text-gray-700"
                                 }`}
                             >
-                                {filters.status === "Success" ? (
+                                {filters.status === "done" ? (
                                     <CheckCircleIcon className="h-3 w-3 mr-1" />
-                                ) : filters.status === "Processing" ? (
+                                ) : filters.status === "processing" ? (
+                                    <ClockIcon className="h-3 w-3 mr-1 animate-spin" />
+                                ) : filters.status === "waiting" ? (
                                     <ClockIcon className="h-3 w-3 mr-1" />
-                                ) : filters.status === "Failed" ? (
+                                ) : filters.status === "invalid" ? (
+                                    <XCircleIcon className="h-3 w-3 mr-1" />
+                                ) : filters.status === "error" ? (
                                     <ExclamationCircleIcon className="h-3 w-3 mr-1" />
                                 ) : null}
                                 Status: {filters.status}
-                            </span>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Activity Table */}
+                    {/* Activity Table and remaining content */}
                     <div className="mb-4">
                         <ActivityTable
                             activities={paginatedData as Activity[]}

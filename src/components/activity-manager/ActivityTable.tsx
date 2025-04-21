@@ -3,7 +3,6 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { Activity } from "@/types/activity-types";
 import { ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/24/solid";
 import {
     CheckCircleIcon,
@@ -12,8 +11,10 @@ import {
     ArrowDownTrayIcon,
     ArrowUpTrayIcon,
     DocumentArrowDownIcon,
-    ExclamationTriangleIcon
+    ExclamationTriangleIcon,
+    XCircleIcon,
 } from "@heroicons/react/24/outline";
+import { Activity } from "@/types";
 
 interface ActivityTableProps {
     activities: Activity[];
@@ -104,27 +105,43 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
     };
 
     // Render status with icon
+    // Modify the renderStatus function in ActivityTable.tsx
+
     const renderStatus = (status: string) => {
         switch (status) {
-            case "Success":
+            case "done":
                 return (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                         <CheckCircleIcon className="mr-1 h-4 w-4 text-green-500" />
-                        成功
+                        完了
                     </span>
                 );
-            case "Processing":
+            case "processing":
                 return (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                         <ClockIcon className="mr-1 h-4 w-4 text-blue-500 animate-spin" />
                         処理中
                     </span>
                 );
-            case "Failed":
+            case "waiting":
+                return (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                        <ClockIcon className="mr-1 h-4 w-4 text-yellow-500" />
+                        待機中
+                    </span>
+                );
+            case "invalid":
+                return (
+                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                        <XCircleIcon className="mr-1 h-4 w-4 text-orange-500" />
+                        無効
+                    </span>
+                );
+            case "error":
                 return (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                         <ExclamationCircleIcon className="mr-1 h-4 w-4 text-red-500" />
-                        失敗
+                        エラー
                     </span>
                 );
             default:
@@ -135,15 +152,17 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
     // Handle download button click
     const handleDownload = (activity: Activity) => {
         if (!activity.s3Link) {
-            alert('ダウンロードリンクが利用できません。(Download link unavailable.)');
+            alert(
+                "ダウンロードリンクが利用できません。(Download link unavailable.)",
+            );
             return;
         }
-        
+
         // In a real application, this would trigger the download process
         console.log(`Downloading from S3: ${activity.s3Link}`);
-        
+
         // Create a temporary anchor element to trigger download
-        const a = document.createElement('a');
+        const a = document.createElement("a");
         a.href = activity.s3Link;
         a.download = activity.filename || `file-${activity.id}.csv`;
         document.body.appendChild(a);
@@ -300,7 +319,9 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                                 <th
                                     scope="col"
                                     className="px-3 py-3.5 text-left text-sm font-semibold text-primary-900 cursor-pointer hover:bg-primary-100 transition-colors"
-                                    onClick={() => requestSort("filename" as any)}
+                                    onClick={() =>
+                                        requestSort("filename" as any)
+                                    }
                                 >
                                     <div className="group flex items-center">
                                         <span>File</span>
@@ -376,20 +397,27 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                                     </td>
                                     {/* File name cell */}
                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                        {activity.type === "Download" && activity.filename ? (
+                                        {activity.type === "Download" &&
+                                        activity.filename ? (
                                             <span className="text-xs font-mono bg-gray-100 px-2 py-1 rounded truncate max-w-[150px] inline-block">
                                                 {activity.filename}
                                             </span>
                                         ) : (
-                                            <span className="text-gray-400">-</span>
+                                            <span className="text-gray-400">
+                                                -
+                                            </span>
                                         )}
                                     </td>
                                     {/* Actions cell */}
+                                    {/* Actions cell */}
                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                        {activity.type === "Download" && activity.status === "Success" ? (
+                                        {activity.type === "Download" &&
+                                        activity.status === "done" ? (
                                             activity.s3Link ? (
                                                 <button
-                                                    onClick={() => handleDownload(activity)}
+                                                    onClick={() =>
+                                                        handleDownload(activity)
+                                                    }
                                                     className="inline-flex items-center rounded-md bg-primary-50 px-2.5 py-1.5 text-xs font-medium text-primary-700 hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1 transition-colors"
                                                     title="ファイルをダウンロード (Download file)"
                                                 >
@@ -402,22 +430,35 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                                                     リンク切れ
                                                 </span>
                                             )
-                                        ) : activity.type === "Download" && activity.status === "Failed" ? (
+                                        ) : activity.type === "Download" &&
+                                          (activity.status === "error" ||
+                                              activity.status === "invalid") ? (
                                             <button
-                                                onClick={() => alert('処理に失敗しました。後でもう一度お試しください。(The process failed. Please try again later.)')}
+                                                onClick={() =>
+                                                    alert(
+                                                        "処理に失敗しました。後でもう一度お試しください。(The process failed. Please try again later.)",
+                                                    )
+                                                }
                                                 className="inline-flex items-center rounded-md bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-colors"
                                                 title="ダウンロードを再試行 (Retry download)"
                                             >
                                                 <DocumentArrowDownIcon className="h-4 w-4 mr-1" />
                                                 再試行
                                             </button>
-                                        ) : activity.type === "Download" && activity.status === "Processing" ? (
+                                        ) : activity.type === "Download" &&
+                                          (activity.status === "processing" ||
+                                              activity.status === "waiting") ? (
                                             <span className="inline-flex items-center text-xs text-blue-500">
                                                 <ClockIcon className="h-4 w-4 mr-1 animate-spin" />
-                                                処理中...
+                                                {activity.status ===
+                                                "processing"
+                                                    ? "処理中..."
+                                                    : "待機中..."}
                                             </span>
                                         ) : (
-                                            <span className="text-gray-400 text-xs">-</span>
+                                            <span className="text-gray-400 text-xs">
+                                                -
+                                            </span>
                                         )}
                                     </td>
                                 </tr>

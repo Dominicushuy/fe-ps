@@ -3,7 +3,12 @@
 import { Client } from "@/types";
 import { mockClients } from "./mock-clients";
 
-export type ActivityStatus = "Success" | "Processing" | "Failed";
+export type ActivityStatus =
+    | "waiting"
+    | "processing"
+    | "done"
+    | "invalid"
+    | "error";
 export type ActivityType = "Download" | "Upload";
 
 export interface Activity {
@@ -47,21 +52,39 @@ const generateFileInfo = (client: Client, type: ActivityType) => {
     return { filename, s3Link };
 };
 
+const getRandomStatus = (): ActivityStatus => {
+    const statuses: ActivityStatus[] = [
+        "waiting",
+        "processing",
+        "done",
+        "invalid",
+        "error",
+    ];
+    const weights = [0.1, 0.2, 0.5, 0.1, 0.1]; // 10% waiting, 20% processing, 50% done, 10% invalid, 10% error
+
+    const random = Math.random();
+    let sum = 0;
+
+    for (let i = 0; i < statuses.length; i++) {
+        sum += weights[i];
+        if (random < sum) {
+            return statuses[i];
+        }
+    }
+
+    return "done";
+};
+
 // Tạo mock activities
 export const mockActivities: Activity[] = Array.from({ length: 50 }, (_, i) => {
     const client = mockClients[Math.floor(Math.random() * mockClients.length)];
     const type = Math.random() > 0.5 ? "Download" : "Upload";
-    const status: ActivityStatus =
-        Math.random() > 0.7
-            ? "Success"
-            : Math.random() > 0.5
-            ? "Processing"
-            : "Failed";
+    const status = getRandomStatus();
 
     const startTime = randomPastDate();
     let endTime = null;
 
-    if (status !== "Processing") {
+    if (status !== "processing" && status !== "waiting") {
         endTime = new Date(startTime);
         endTime.setMinutes(
             endTime.getMinutes() + Math.floor(Math.random() * 30),
@@ -77,7 +100,7 @@ export const mockActivities: Activity[] = Array.from({ length: 50 }, (_, i) => {
         fileInfo = generateFileInfo(client, type);
 
         // Only successful downloads should have valid S3 links
-        if (status !== "Success") {
+        if (status !== "done") {
             fileInfo.s3Link = null;
         }
     }

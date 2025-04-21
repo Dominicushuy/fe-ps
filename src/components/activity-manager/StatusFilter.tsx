@@ -7,6 +7,7 @@ import {
     CheckCircleIcon,
     ClockIcon,
     ExclamationCircleIcon,
+    XCircleIcon,
 } from "@heroicons/react/24/outline";
 import { ActivityStatus } from "@/types/activity-types";
 
@@ -19,39 +20,49 @@ export default function StatusFilter({
     selectedStatus,
     onStatusChange,
 }: StatusFilterProps) {
-    // Định nghĩa các status với màu sắc và icon tương ứng để tái sử dụng mã
+    // Define the status options with their icons and styling
     const statusOptions = [
         {
             value: "All",
             label: "All",
             icon: null,
-            activeClass: "bg-primary-600 text-white border-primary-600",
-            hoverClass: "hover:bg-gray-50",
+            activeClass: "bg-primary-600 text-white",
+            inactiveClass: "bg-gray-100 text-gray-700 hover:bg-gray-200",
         },
         {
-            value: "Success",
-            label: "Success",
-            icon: (
-                <CheckCircleIcon className="h-3.5 w-3.5 mr-1 flex-shrink-0" />
-            ),
-            activeClass: "bg-green-600 text-white border-green-600",
-            hoverClass: "hover:bg-green-50",
+            value: "waiting",
+            label: "Waiting",
+            icon: <ClockIcon className="h-3 w-3 mr-1" />,
+            activeClass: "bg-yellow-600 text-white",
+            inactiveClass: "bg-yellow-50 text-yellow-700 hover:bg-yellow-100",
         },
         {
-            value: "Processing",
+            value: "processing",
             label: "Processing",
-            icon: <ClockIcon className="h-3.5 w-3.5 mr-1 flex-shrink-0" />,
-            activeClass: "bg-blue-600 text-white border-blue-600",
-            hoverClass: "hover:bg-blue-50",
+            icon: <ClockIcon className="h-3 w-3 mr-1" />,
+            activeClass: "bg-blue-600 text-white",
+            inactiveClass: "bg-blue-50 text-blue-700 hover:bg-blue-100",
         },
         {
-            value: "Failed",
-            label: "Failed",
-            icon: (
-                <ExclamationCircleIcon className="h-3.5 w-3.5 mr-1 flex-shrink-0" />
-            ),
-            activeClass: "bg-red-600 text-white border-red-600",
-            hoverClass: "hover:bg-red-50",
+            value: "done",
+            label: "Done",
+            icon: <CheckCircleIcon className="h-3 w-3 mr-1" />,
+            activeClass: "bg-green-600 text-white",
+            inactiveClass: "bg-green-50 text-green-700 hover:bg-green-100",
+        },
+        {
+            value: "invalid",
+            label: "Invalid",
+            icon: <XCircleIcon className="h-3 w-3 mr-1" />,
+            activeClass: "bg-orange-600 text-white",
+            inactiveClass: "bg-orange-50 text-orange-700 hover:bg-orange-100",
+        },
+        {
+            value: "error",
+            label: "Error",
+            icon: <ExclamationCircleIcon className="h-3 w-3 mr-1" />,
+            activeClass: "bg-red-600 text-white",
+            inactiveClass: "bg-red-50 text-red-700 hover:bg-red-100",
         },
     ];
 
@@ -60,55 +71,30 @@ export default function StatusFilter({
             <label className="block text-sm font-medium text-gray-700 mb-1">
                 ステータスフィルター (Status Filter)
             </label>
-            <div className="flex shadow-sm">
-                {statusOptions.map((option, index) => {
-                    // Xác định kiểu border-radius cho từng nút
-                    const isFirst = index === 0;
-                    const isLast = index === statusOptions.length - 1;
-                    const borderRadiusClass = isFirst
-                        ? "rounded-l-md "
-                        : isLast
-                        ? "rounded-r-md "
-                        : "";
 
-                    // Xác định trạng thái active
-                    const isActive = selectedStatus === option.value;
-
-                    // Xác định class cho nút
-                    const buttonClass = `
-                        relative flex-1 h-10 flex items-center justify-center text-xs font-medium 
-                        ${borderRadiusClass}
-                        ${
-                            isActive
-                                ? option.activeClass
-                                : `bg-white text-gray-700 border-gray-300 ${option.hoverClass}`
+            {/* Grid layout for status buttons */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {statusOptions.map(option => (
+                    <button
+                        key={option.value}
+                        className={`px-3 py-2 rounded text-center text-xs font-medium transition-colors
+                            ${
+                                selectedStatus === option.value
+                                    ? option.activeClass
+                                    : option.inactiveClass
+                            }`}
+                        onClick={() =>
+                            onStatusChange(
+                                option.value as ActivityStatus | "All",
+                            )
                         }
-                        border focus:outline-none focus:ring-1
-                        ${
-                            isActive
-                                ? ""
-                                : "focus:ring-primary-500 focus:border-primary-500"
-                        }
-                    `;
-
-                    return (
-                        <button
-                            key={option.value}
-                            type="button"
-                            className={buttonClass}
-                            onClick={() =>
-                                onStatusChange(
-                                    option.value as ActivityStatus | "All",
-                                )
-                            }
-                        >
-                            <div className="flex items-center whitespace-nowrap">
-                                {option.icon}
-                                <span className="truncate">{option.label}</span>
-                            </div>
-                        </button>
-                    );
-                })}
+                    >
+                        <div className="flex items-center justify-center">
+                            {option.icon}
+                            <span className="truncate">{option.label}</span>
+                        </div>
+                    </button>
+                ))}
             </div>
         </div>
     );

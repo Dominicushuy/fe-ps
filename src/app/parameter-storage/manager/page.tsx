@@ -67,6 +67,8 @@ export default function CSVManagerPage() {
     const [isDownloadSubmitting, setIsDownloadSubmitting] = useState(false);
     const [showPreview, setShowPreview] = useState(true);
     const [downloadSuccess, setDownloadSuccess] = useState(false);
+    // Add a new state for the employee ID
+    const [employeeId, setEmployeeId] = useState("");
 
     // Mock columns for advanced filters
     const mockColumns = [
@@ -85,6 +87,12 @@ export default function CSVManagerPage() {
 
     // Handle download form submission
     const handleDownloadSubmit = () => {
+        // Add validation for employee ID
+        if (!employeeId.trim()) {
+            alert("社員IDを入力してください (Please enter your employee ID)");
+            return;
+        }
+
         if (selectedAccounts.length === 0) {
             alert("アカウントを選択してください (Please select accounts)");
             return;
@@ -104,6 +112,7 @@ export default function CSVManagerPage() {
                 accounts: selectedAccounts,
                 dataLayers: selectedDataLayers,
                 advancedFilters: filters,
+                employeeId: employeeId, // Include the employee ID
             });
 
             setIsDownloadSubmitting(false);
@@ -259,6 +268,36 @@ export default function CSVManagerPage() {
 
                                 {/* Form Fields */}
                                 <div className="space-y-6">
+                                    {/* Add Employee ID Field - Required */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            社員ID (Employee ID){" "}
+                                            <span className="text-red-500">
+                                                *
+                                            </span>
+                                        </label>
+                                        <div className="relative">
+                                            <input
+                                                type="text"
+                                                value={employeeId}
+                                                onChange={e =>
+                                                    setEmployeeId(
+                                                        e.target.value,
+                                                    )
+                                                }
+                                                placeholder="社員IDを入力してください (Enter your employee ID)"
+                                                className="w-1/2 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
+                                                required
+                                            />
+                                            {!employeeId.trim() && (
+                                                <p className="mt-1 text-sm text-red-500">
+                                                    社員IDは必須です (Employee
+                                                    ID is required)
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+
                                     {/* Account Filter - Required */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -358,12 +397,14 @@ export default function CSVManagerPage() {
                                                 selectedAccounts.length === 0 ||
                                                 selectedDataLayers.length ===
                                                     0 ||
+                                                !employeeId.trim() ||
                                                 isDownloadSubmitting
                                             }
                                             className={`inline-flex items-center px-6 py-3 shadow-sm text-sm font-medium rounded-md text-white
                         ${
                             selectedAccounts.length === 0 ||
-                            selectedDataLayers.length === 0
+                            selectedDataLayers.length === 0 ||
+                            !employeeId.trim()
                                 ? "bg-gray-400 cursor-not-allowed"
                                 : isDownloadSubmitting
                                 ? "bg-primary-600 opacity-75 cursor-wait"
