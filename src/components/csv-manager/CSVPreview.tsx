@@ -17,7 +17,7 @@ interface CSVPreviewProps {
     selectedClient: Client | null;
     onValidationComplete: (isValid: boolean, data: CSVRow[]) => void;
     isSubmitting?: boolean;
-    onSubmit?: () => void;
+    onSubmit?: (isDuplicatable?: boolean) => void;
     onUploadComplete?: () => void;
 }
 
@@ -185,8 +185,8 @@ export default function CSVPreview({
     // Xử lý việc submit với xác nhận ghi đè
     const handleSubmit = () => {
         if (onSubmit && isValid) {
-            onSubmit();
-            // Không cần clear file ở đây vì sẽ được clear từ hook useCSVManager
+            // Pass the confirmOverwrite flag to the onSubmit function
+            onSubmit(confirmOverwrite);
         }
     };
 

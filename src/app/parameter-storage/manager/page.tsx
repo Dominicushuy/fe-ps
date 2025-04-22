@@ -104,7 +104,17 @@ export default function CSVManagerPage() {
     return (
         <div className="space-y-8">
             {/* Toast Container */}
-            <ToastContainer />
+            <ToastContainer
+                position="top-right"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+            />
 
             <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
                 <h2 className="text-xl font-semibold mb-6 text-primary-900 border-b border-primary-100 pb-3">

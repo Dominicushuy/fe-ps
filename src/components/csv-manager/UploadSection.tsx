@@ -11,7 +11,7 @@ interface UploadSectionProps {
     isSubmitting: boolean;
     onFileSelect: (file: File | null) => void;
     onValidationComplete: (isValid: boolean, data: any[]) => void;
-    onSubmit: () => void;
+    onSubmit: (isDuplicatable?: boolean) => void;
 }
 
 /**

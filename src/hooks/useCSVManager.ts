@@ -14,6 +14,7 @@ import {
 } from "@/types";
 import { mockCSVData } from "@/data/mock-csv-data";
 import { downloadCSV } from "@/lib/utils/csv-export";
+import { uploadCSVFile } from "@/lib/api/upload";
 
 // Define all available data layers
 const ALL_DATA_LAYERS: DataLayer[] = ["Campaign", "Adgroup", "Ad", "Keyword"];
@@ -157,40 +158,71 @@ export function useCSVManager() {
     );
 
     // Cập nhật hàm handleSubmitData để hiển thị toast và navigation dialog
-    const handleSubmitData = useCallback(() => {
-        if (!isValid) return;
+    const handleSubmitData = useCallback(
+        async (isDuplicatable = false) => {
+            if (!isValid || !file || !selectedClient) return;
 
-        setIsSubmitting(true);
+            setIsSubmitting(true);
 
-        // Giả lập quá trình submit
-        setTimeout(() => {
-            // Trong trường hợp thực tế, đây là nơi bạn sẽ gửi dữ liệu lên server
-            console.log("Submitting data:", data);
-            console.log("Selected accounts:", selectedAccounts);
-            console.log("Selected data layers:", selectedDataLayers);
+            try {
+                // Use the imported API function
+                const response = await uploadCSVFile(
+                    file,
+                    selectedClient.id,
+                    isDuplicatable,
+                );
 
-            // Clear file và data sau khi submit thành công
-            setFile(null);
+                console.log("Upload response:", response);
 
-            // Hiển thị thông báo thành công với toast
-            toast.success(
-                "データが正常にアップロードされました！(Data successfully uploaded!)",
-                {
+                // Handle successful response
+                if (response.success) {
+                    // Clear file and data
+                    setFile(null);
+
+                    // Show success toast
+                    toast.success(
+                        "データが正常にアップロードされました！(Data successfully uploaded!)",
+                        {
+                            position: "top-right",
+                            autoClose: 5000,
+                            hideProgressBar: false,
+                            closeOnClick: true,
+                            pauseOnHover: true,
+                            draggable: true,
+                        },
+                    );
+
+                    // Show navigation confirmation dialog
+                    setShowNavigationConfirm(true);
+                }
+            } catch (error) {
+                console.error("Error uploading CSV file:", error);
+
+                // Handle different types of errors
+                let errorMessage =
+                    "エラーが発生しました。後でもう一度お試しください。(An error occurred. Please try again later.)";
+
+                if (error instanceof Response) {
+                    if (error.status === 400) {
+                        errorMessage =
+                            "リクエストが無効です。ファイルを確認してください。(Invalid request. Please check the file.)";
+                    } else if (error.status === 401) {
+                        errorMessage =
+                            "認証が必要です。再度ログインしてください。(Authentication required. Please log in again.)";
+                    }
+                }
+
+                // Show error toast
+                toast.error(errorMessage, {
                     position: "top-right",
                     autoClose: 5000,
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                },
-            );
-
-            // Hiển thị dialog xác nhận chuyển hướng
-            setShowNavigationConfirm(true);
-
-            setIsSubmitting(false);
-        }, 1500);
-    }, [isValid, data, selectedAccounts, selectedDataLayers]);
+                });
+            } finally {
+                setIsSubmitting(false);
+            }
+        },
+        [isValid, file, selectedClient, setFile, setShowNavigationConfirm],
+    );
 
     // Hàm xử lý khi xác nhận chuyển hướng sang activity-log
     const handleNavigateToActivityLog = useCallback(() => {
