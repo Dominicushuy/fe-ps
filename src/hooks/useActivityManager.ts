@@ -1,4 +1,7 @@
+// src/hooks/useActivityManager.ts
+
 import { useState, useEffect, useMemo, useCallback } from "react";
+import { useSearchParams } from "next/navigation";
 import { Client } from "@/types";
 import {
     ActivityFilters,
@@ -10,7 +13,15 @@ import { mockActivities } from "@/data/mock-activities";
 import { useClients } from "@/hooks/useClients";
 
 export const useActivityManager = () => {
-    const { clients } = useClients({ limit: 500 });
+    // Get URL parameters
+    const searchParams = useSearchParams();
+    const clientIdParam = searchParams ? searchParams.get("clientId") : null;
+
+    const { clients, isLoading } = useClients({
+        limit: 500,
+        // Always fetch clients for the dropdown, regardless of URL parameter
+        enabled: true,
+    });
 
     const [filters, setFilters] = useState<ActivityFilters>({
         client: null,
@@ -24,6 +35,44 @@ export const useActivityManager = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
+    // Track if we've tried to process the URL parameter
+    const [urlParamProcessed, setUrlParamProcessed] = useState(false);
+
+    // Handle client selection from URL parameter
+    useEffect(() => {
+        // Only run if:
+        // 1. We have a clientIdParam
+        // 2. We haven't processed it yet
+        // 3. Client data has loaded
+        // 4. No client is already selected (to avoid overriding user selection)
+        if (
+            clientIdParam &&
+            !urlParamProcessed &&
+            !isLoading &&
+            clients.length > 0 &&
+            !filters.client
+        ) {
+            // Try to find client by ID or accountId
+            const client = clients.find(
+                c => c.id === clientIdParam || c.accountId === clientIdParam,
+            );
+
+            if (client) {
+                console.log(
+                    `Auto-selecting client from URL: ${client.name} (ID: ${client.id})`,
+                );
+                setFilters(prev => ({ ...prev, client }));
+            } else {
+                console.warn(
+                    `Client with ID "${clientIdParam}" not found in available clients`,
+                );
+            }
+
+            // Mark as processed regardless of whether we found the client
+            setUrlParamProcessed(true);
+        }
+    }, [clientIdParam, urlParamProcessed, clients, isLoading, filters.client]);
+
     const activities = useMemo(() => {
         if (clients.length === 0) return mockActivities;
 
@@ -35,6 +84,7 @@ export const useActivityManager = () => {
         });
     }, [clients]);
 
+    // Filter activities based on selected filters
     const filteredData = useMemo(() => {
         let result = [...activities];
 
@@ -110,15 +160,18 @@ export const useActivityManager = () => {
         return result;
     }, [filters, activities]);
 
+    // Paginate the filtered data
     const paginatedData = useMemo(() => {
         const startIndex = (currentPage - 1) * itemsPerPage;
         return filteredData.slice(startIndex, startIndex + itemsPerPage);
     }, [filteredData, currentPage, itemsPerPage]);
 
+    // Reset to page 1 when filters change
     useEffect(() => {
         setCurrentPage(1);
     }, [filters]);
 
+    // Client selection handler
     const handleClientSelect = useCallback((client: Client | null) => {
         setFilters(prev => ({ ...prev, client }));
     }, []);
@@ -173,5 +226,6 @@ export const useActivityManager = () => {
         handleStatusChange,
         handlePageChange,
         handleItemsPerPageChange,
+        isLoadingClients: isLoading,
     };
 };
