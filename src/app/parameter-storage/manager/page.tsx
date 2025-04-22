@@ -45,20 +45,14 @@ export default function CSVManagerPage() {
         handleDataLayerSelect,
     } = useCSVManager();
 
-    // Local state for download form and preview
+    // Local state for download form
     const [employeeId, setEmployeeId] = useState("");
     const [isDownloadSubmitting, setIsDownloadSubmitting] = useState(false);
-    const [showPreview, setShowPreview] = useState(true);
     const [downloadSuccess, setDownloadSuccess] = useState(false);
 
     // Handler to clear filters
     const handleClearFilters = () => {
         setFilters([]);
-    };
-
-    // Handler to toggle preview visibility
-    const handleTogglePreview = () => {
-        setShowPreview(!showPreview);
     };
 
     // Handle download form submission
@@ -164,7 +158,6 @@ export default function CSVManagerPage() {
                         currentPage={currentPage}
                         itemsPerPage={itemsPerPage}
                         searchTerm={searchTerm}
-                        showPreview={showPreview}
                         isSubmitting={isDownloadSubmitting}
                         downloadSuccess={downloadSuccess}
                         onEmployeeIdChange={setEmployeeId}
@@ -172,7 +165,6 @@ export default function CSVManagerPage() {
                         onDataLayerChange={handleDataLayerSelect}
                         onFilterChange={handleFilterChange}
                         onClearFilters={handleClearFilters}
-                        onTogglePreview={handleTogglePreview}
                         onSubmit={handleDownloadSubmit}
                         onSearchChange={handleSearch}
                         onPageChange={handlePageChange}

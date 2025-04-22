@@ -4,7 +4,6 @@ import React from "react";
 import {
     DocumentCheckIcon,
     ArrowDownTrayIcon,
-    EyeIcon,
 } from "@heroicons/react/24/outline";
 import EnhancedAccountFilter from "./EnhancedAccountFilter";
 import DataLayerFilter from "./DataLayerFilter";
@@ -19,13 +18,11 @@ interface DownloadFormProps {
     filters: ColumnFilter[];
     isSubmitting: boolean;
     downloadSuccess: boolean;
-    showPreview: boolean;
     onEmployeeIdChange: (id: string) => void;
     onAccountChange: (accounts: MediaAccount[]) => void;
     onDataLayerChange: (layers: DataLayer[]) => void;
     onFilterChange: (filters: ColumnFilter[]) => void;
     onClearFilters: () => void;
-    onTogglePreview: () => void;
     onSubmit: () => void;
 }
 
@@ -39,13 +36,11 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
     filters,
     isSubmitting,
     downloadSuccess,
-    showPreview,
     onEmployeeIdChange,
     onAccountChange,
     onDataLayerChange,
     onFilterChange,
     onClearFilters,
-    onTogglePreview,
     onSubmit,
 }) => {
     // Mock columns for advanced filters
@@ -178,17 +173,7 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
                     )}
 
                     {/* Action Buttons */}
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-200">
-                        <button
-                            type="button"
-                            onClick={onTogglePreview}
-                            className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
-                        >
-                            <EyeIcon className="h-5 w-5 mr-2 text-gray-500" />
-                            プレビューを {showPreview ? "隠す" : "表示"} (Toggle
-                            Preview)
-                        </button>
-
+                    <div className="flex items-center justify-end pt-4 border-t border-gray-200">
                         <button
                             type="button"
                             onClick={onSubmit}
