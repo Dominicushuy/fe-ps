@@ -1,6 +1,4 @@
-"use client";
-
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Client, CSVRow, ValidationError } from "@/types";
 import { Switch } from "@headlessui/react";
 import {
@@ -183,12 +181,12 @@ export default function CSVPreview({
     }, [file, selectedClient, onValidationComplete]);
 
     // Xử lý việc submit với xác nhận ghi đè
-    const handleSubmit = () => {
+    const handleSubmit = useCallback(() => {
         if (onSubmit && isValid) {
             // Pass the confirmOverwrite flag to the onSubmit function
             onSubmit(confirmOverwrite);
         }
-    };
+    }, [onSubmit, isValid, confirmOverwrite]);
 
     // Hiển thị trạng thái đang validate
     if (isValidating) {
@@ -408,16 +406,15 @@ export default function CSVPreview({
                                             {selectedClient.id})
                                         </p>
                                         <p className="text-xs text-red-700 mt-1">
-                                            CSVファイル内のCIDは、このクライアントのIDと一致する必要があります。CIDの最初の4桁が「
-                                            {selectedClient.id.slice(2)}
+                                            CSVファイル内のCIDは、このクライアントのIDと一致する必要があります。CIDの最初の部分が「
+                                            {selectedClient.id}
                                             」で始まる必要があります。
                                         </p>
                                         <p className="text-xs text-red-700 mt-1">
                                             (CIDs in the CSV file must match
-                                            this client&apos;s ID. The first 4
-                                            digits of CID should start with
-                                            &quot;
-                                            {selectedClient.id.slice(2)}&quot;)
+                                            this client&apos;s ID. The first
+                                            part of CID should start with &quot;
+                                            {selectedClient.id}&quot;)
                                         </p>
                                     </div>
                                 </div>

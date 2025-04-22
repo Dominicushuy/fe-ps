@@ -14,7 +14,7 @@ import {
 } from "@/types";
 import { mockCSVData } from "@/data/mock-csv-data";
 import { downloadCSV } from "@/lib/utils/csv-export";
-import { uploadCSVFile } from "@/lib/api/upload";
+import { uploadCSVFile, UploadCSVResponse } from "@/lib/api/upload";
 
 // Define all available data layers
 const ALL_DATA_LAYERS: DataLayer[] = ["Campaign", "Adgroup", "Ad", "Keyword"];
@@ -45,6 +45,10 @@ export function useCSVManager() {
     const [selectedDataLayers, setSelectedDataLayers] = useState<DataLayer[]>([
         ...ALL_DATA_LAYERS,
     ]);
+
+    // Track the last upload response
+    const [lastUploadResponse, setLastUploadResponse] =
+        useState<UploadCSVResponse | null>(null);
 
     // Thêm state cho dialog xác nhận thay đổi client
     const [showClientChangeConfirm, setShowClientChangeConfirm] =
@@ -157,7 +161,7 @@ export function useCSVManager() {
         [],
     );
 
-    // Cập nhật hàm handleSubmitData để hiển thị toast và navigation dialog
+    // Updated handleSubmitData to handle the API response
     const handleSubmitData = useCallback(
         async (isDuplicatable = false) => {
             if (!isValid || !file || !selectedClient) return;
@@ -172,24 +176,18 @@ export function useCSVManager() {
                     isDuplicatable,
                 );
 
-                console.log("Upload response:", response);
+                // Store the response for later reference
+                setLastUploadResponse(response);
 
-                // Handle successful response
-                if (response.success) {
-                    // Clear file and data
+                if (response) {
                     setFile(null);
+                    setData([]);
+                    setValidationErrors([]);
+                    setIsValid(false);
 
                     // Show success toast
                     toast.success(
-                        "データが正常にアップロードされました！(Data successfully uploaded!)",
-                        {
-                            position: "top-right",
-                            autoClose: 5000,
-                            hideProgressBar: false,
-                            closeOnClick: true,
-                            pauseOnHover: true,
-                            draggable: true,
-                        },
+                        `データが正常にアップロードされました！(Data successfully uploaded! ID: ${response.id})`,
                     );
 
                     // Show navigation confirmation dialog
@@ -210,18 +208,17 @@ export function useCSVManager() {
                         errorMessage =
                             "認証が必要です。再度ログインしてください。(Authentication required. Please log in again.)";
                     }
+                } else if (error instanceof Error) {
+                    errorMessage = `${error.message}`;
                 }
 
                 // Show error toast
-                toast.error(errorMessage, {
-                    position: "top-right",
-                    autoClose: 5000,
-                });
+                toast.error(errorMessage);
             } finally {
                 setIsSubmitting(false);
             }
         },
-        [isValid, file, selectedClient, setFile, setShowNavigationConfirm],
+        [isValid, file, selectedClient],
     );
 
     // Hàm xử lý khi xác nhận chuyển hướng sang activity-log
@@ -287,6 +284,7 @@ export function useCSVManager() {
         showNavigationConfirm,
         selectedAccounts,
         selectedDataLayers,
+        lastUploadResponse,
         handleModeChange,
         handleClientSelect,
         handleFileSelect,

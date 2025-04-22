@@ -1,6 +1,6 @@
 // src/components/csv-manager/UploadSection.tsx
 
-import React from "react";
+import React, { useCallback } from "react";
 import UploadZone from "./UploadZone";
 import CSVPreview from "./CSVPreview";
 import { Client } from "@/types";
@@ -25,13 +25,19 @@ const UploadSection: React.FC<UploadSectionProps> = ({
     onValidationComplete,
     onSubmit,
 }) => {
+    // Handle upload completion - clear file
+    const handleUploadComplete = useCallback(() => {
+        // This will be called after a successful upload
+        onFileSelect(null);
+    }, [onFileSelect]);
+
     return (
         <div className="space-y-6">
             {/* Upload Zone */}
             <UploadZone
                 externalFile={file}
                 onFileSelect={onFileSelect}
-                disabled={!selectedClient}
+                disabled={!selectedClient || isSubmitting}
             />
 
             {/* Display message if no client is selected */}
@@ -50,6 +56,7 @@ const UploadSection: React.FC<UploadSectionProps> = ({
                     onValidationComplete={onValidationComplete}
                     isSubmitting={isSubmitting}
                     onSubmit={onSubmit}
+                    onUploadComplete={handleUploadComplete}
                 />
             )}
         </div>

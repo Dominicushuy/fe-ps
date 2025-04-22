@@ -3,6 +3,26 @@
 import fetchWithAuth from "./fetchUtils";
 
 /**
+ * Upload CSV file response interface
+ */
+export interface UploadCSVResponse {
+    id: string;
+    created: string;
+    modified: string;
+    employee_id: string;
+    client_id: string;
+    action_type: string;
+    filter_details: Record<string, any>;
+    status: string;
+    start_time: string | null;
+    end_time: string | null;
+    is_duplicatable: boolean;
+    file_path: string;
+    batch_id: string;
+    download_level: string | null;
+}
+
+/**
  * Upload a CSV file to the Param Storage system
  * @param file - The CSV file to upload
  * @param clientId - The client ID linked to this upload
@@ -13,7 +33,7 @@ export async function uploadCSVFile(
     file: File,
     clientId: string,
     isDuplicatable: boolean = false,
-): Promise<{ success: boolean }> {
+): Promise<UploadCSVResponse> {
     // Create a FormData instance to send the file
     const formData = new FormData();
 
