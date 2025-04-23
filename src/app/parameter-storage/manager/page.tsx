@@ -1,7 +1,8 @@
 // src/app/parameter-storage/manager/page.tsx
+
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import ModeToggle from "@/components/csv-manager/ModeToggle";
 import ClientSelect from "@/components/csv-manager/ClientSelect";
 import ConfirmClientChangeDialog from "@/components/csv-manager/ConfirmClientChangeDialog";
@@ -28,6 +29,11 @@ export default function CSVManagerPage() {
         showNavigationConfirm,
         selectedAccounts,
         selectedDataLayers,
+        // New state from the hook
+        employeeId,
+        isDownloadSubmitting,
+        downloadSuccess,
+
         handleModeChange,
         handleClientSelect,
         handleFileSelect,
@@ -44,54 +50,15 @@ export default function CSVManagerPage() {
         handleCloseNavigationDialog,
         handleAccountSelect,
         handleDataLayerSelect,
+        // New handler from the hook
+        handleDownloadSubmit,
+        // New setter from the hook
+        setEmployeeId,
     } = useCSVManager();
-
-    // Local state for download form
-    const [employeeId, setEmployeeId] = useState("");
-    const [isDownloadSubmitting, setIsDownloadSubmitting] = useState(false);
-    const [downloadSuccess, setDownloadSuccess] = useState(false);
 
     // Handler to clear filters
     const handleClearFilters = () => {
         setFilters([]);
-    };
-
-    // Handle download form submission
-    const handleDownloadSubmit = () => {
-        // Add validation for employee ID
-        if (!employeeId.trim()) {
-            alert("社員IDを入力してください (Please enter your employee ID)");
-            return;
-        }
-
-        if (selectedAccounts.length === 0) {
-            alert("アカウントを選択してください (Please select accounts)");
-            return;
-        }
-
-        if (selectedDataLayers.length === 0) {
-            alert("データ層を選択してください (Please select data layers)");
-            return;
-        }
-
-        setIsDownloadSubmitting(true);
-
-        // Simulate API call to create download process
-        setTimeout(() => {
-            console.log("Download process initiated with:", {
-                client: selectedClient,
-                accounts: selectedAccounts,
-                dataLayers: selectedDataLayers,
-                advancedFilters: filters,
-                employeeId: employeeId,
-            });
-
-            setIsDownloadSubmitting(false);
-            setDownloadSuccess(true);
-
-            // Reset success message after 5 seconds
-            setTimeout(() => setDownloadSuccess(false), 5000);
-        }, 1500);
     };
 
     return (

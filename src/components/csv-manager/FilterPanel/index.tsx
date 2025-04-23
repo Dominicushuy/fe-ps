@@ -35,7 +35,7 @@ export default function FilterPanel({
         const newFilter: ColumnFilter = {
             id: generateFilterId(),
             columnName: columns[0],
-            operator: "all",
+            operator: "ALL", // Updated from "all" to "ALL"
             value: "",
         };
         onFilterChange([...filters, newFilter]);
@@ -64,32 +64,29 @@ export default function FilterPanel({
     // Helper function to get operator symbol for display
     const getOperatorSymbol = (operator: FilterOperator): string => {
         switch (operator) {
-            case "all":
+            case "ALL":
                 return "全て";
-            case "contains":
-                return "含む";
-            case "notContains":
+            case "CASE_CONTAIN_AND":
+            case "CONTAIN_AND":
+                return "含む AND";
+            case "CASE_CONTAIN_OR":
+            case "CONTAIN_OR":
+                return "含む OR";
+            case "CASE_NOT_CONTAIN":
+            case "NOT_CONTAIN":
                 return "含まない";
-            case "startsWith":
+            case "CASE_START_WITH":
+            case "START_WITH":
                 return "始まる";
-            case "endsWith":
+            case "CASE_END_WITH":
+            case "END_WITH":
                 return "終わる";
-            case "equals":
+            case "CASE_EQUAL":
+            case "EQUAL":
                 return "=";
-            case "notEquals":
+            case "CASE_NOT_EQUAL":
+            case "NOT_EQUAL":
                 return "≠";
-            case "containsLowerCase":
-                return "含む(小)";
-            case "notContainsLowerCase":
-                return "含まない(小)";
-            case "startsWithLowerCase":
-                return "始まる(小)";
-            case "endsWithLowerCase":
-                return "終わる(小)";
-            case "equalsLowerCase":
-                return "=(小)";
-            case "notEqualsLowerCase":
-                return "≠(小)";
             case "other":
                 return "その他";
             default:

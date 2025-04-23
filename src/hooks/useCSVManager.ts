@@ -15,6 +15,7 @@ import {
 import { mockCSVData } from "@/data/mock-csv-data";
 import { downloadCSV } from "@/lib/utils/csv-export";
 import { uploadCSVFile, UploadCSVResponse } from "@/lib/api/upload";
+import { createDownloadProcess } from "@/lib/api/param-storage";
 
 export function useCSVManager() {
     const router = useRouter();
@@ -31,6 +32,11 @@ export function useCSVManager() {
     const [searchTerm, setSearchTerm] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
+
+    // Add state for download form
+    const [employeeId, setEmployeeId] = useState("");
+    const [isDownloadSubmitting, setIsDownloadSubmitting] = useState(false);
+    const [downloadSuccess, setDownloadSuccess] = useState(false);
 
     // New states for account, and data layer filters
     // Removed selectedMedia state
@@ -218,6 +224,104 @@ export function useCSVManager() {
         },
         [isValid, file, selectedClient],
     );
+    // Move the download submit handler to the hook
+    const handleDownloadSubmit = useCallback(async () => {
+        // Add validation for employee ID
+        if (!employeeId.trim()) {
+            toast.error(
+                "社員IDを入力してください (Please enter your employee ID)",
+            );
+            return;
+        }
+
+        if (selectedAccounts.length === 0) {
+            toast.error(
+                "アカウントを選択してください (Please select accounts)",
+            );
+            return;
+        }
+
+        if (selectedDataLayers.length === 0) {
+            toast.error(
+                "データ層を選択してください (Please select data layers)",
+            );
+            return;
+        }
+
+        // Get the download level (first selected data layer)
+        const downloadLevel =
+            selectedDataLayers.length > 0 ? selectedDataLayers[0] : null;
+
+        // Extract account IDs from selected accounts
+        const accountIds = selectedAccounts.map(account => account.accountId);
+
+        setIsDownloadSubmitting(true);
+
+        try {
+            // Call the API service to create download process
+            const response = await createDownloadProcess(
+                employeeId,
+                selectedClient?.id || "",
+                accountIds,
+                downloadLevel,
+                filters,
+            );
+
+            console.log("Download process created:", response);
+
+            // Show success toast with the process ID
+            toast.success(
+                `ダウンロードリクエストが送信されました。プロセスID: ${response.id} (Download request submitted. Process ID: ${response.id})`,
+            );
+
+            setDownloadSuccess(true);
+
+            // Clear all form fields after successful submission
+            setEmployeeId("");
+            setSelectedAccounts([]);
+            setSelectedDataLayers([]);
+            setFilters([]);
+
+            // Show navigation confirmation dialog
+            setShowNavigationConfirm(true);
+
+            // Reset success message after 5 seconds
+            setTimeout(() => setDownloadSuccess(false), 5000);
+        } catch (error) {
+            console.error("Error submitting download request:", error);
+
+            // Handle different types of errors
+            let errorMessage =
+                "エラーが発生しました。後でもう一度お試しください。(An error occurred. Please try again later.)";
+
+            if (error instanceof Response) {
+                if (error.status === 400) {
+                    errorMessage =
+                        "リクエストが無効です。入力内容を確認してください。(Invalid request. Please check your input.)";
+                } else if (error.status === 401) {
+                    errorMessage =
+                        "認証が必要です。再度ログインしてください。(Authentication required. Please log in again.)";
+                }
+            } else if (error instanceof Error) {
+                errorMessage = `${error.message}`;
+            }
+
+            toast.error(errorMessage);
+        } finally {
+            setIsDownloadSubmitting(false);
+        }
+    }, [
+        employeeId,
+        selectedAccounts,
+        selectedDataLayers,
+        selectedClient,
+        filters,
+        setEmployeeId,
+        setFilters,
+        setSelectedAccounts,
+        setSelectedDataLayers,
+        setShowNavigationConfirm,
+    ]);
 
     // Hàm xử lý khi xác nhận chuyển hướng sang activity-log
     const handleNavigateToActivityLog = useCallback(() => {
@@ -284,6 +388,12 @@ export function useCSVManager() {
         selectedDataLayers,
         lastUploadResponse,
         clientId: selectedClient?.id || null, // Add clientId for account filter
+
+        // Export the new state variables
+        employeeId,
+        isDownloadSubmitting,
+        downloadSuccess,
+
         handleModeChange,
         handleClientSelect,
         handleFileSelect,
@@ -295,6 +405,15 @@ export function useCSVManager() {
         handleItemsPerPageChange,
         handleSearch,
         handleExportCSV,
+        // Export the new handler
+        handleDownloadSubmit,
+        // Giữ lại các setters để hỗ trợ các trường hợp khác
+        setFilters,
+        setSearchTerm,
+        setCurrentPage,
+        setItemsPerPage,
+        // Export new setter
+        setEmployeeId,
         // Thêm handlers cho dialog xác nhận
         handleConfirmClientChange,
         handleCancelClientChange,
@@ -304,10 +423,5 @@ export function useCSVManager() {
         // Handlers for new filters
         handleAccountSelect,
         handleDataLayerSelect,
-        // Giữ lại các setters để hỗ trợ các trường hợp khác
-        setFilters,
-        setSearchTerm,
-        setCurrentPage,
-        setItemsPerPage,
     };
 }
