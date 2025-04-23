@@ -26,8 +26,16 @@ export interface MediaAccount {
     name: string;
 }
 
-// Data layer type (for Campaign, Adgroup, Ad, Keyword filter)
-export type DataLayer = "Campaign" | "Adgroup" | "Ad" | "Keyword";
+// Data layer type with new format matching backend enum
+export type DataLayer =
+    | "campaign"
+    | "ad_group"
+    | "ad"
+    | "keyword"
+    | "ad_and_keyword";
+
+// Helper type to define UI display options
+export type DataLayerUIOption = "campaign" | "ad_group" | "ad" | "keyword";
 
 // Type cho dữ liệu CSV - đã cập nhật để phù hợp với template
 export interface CSVRow {

@@ -1,12 +1,12 @@
 // src/components/csv-manager/DataLayerFilter.tsx
 
 import React, { useEffect } from "react";
-import { DataLayer } from "@/types";
+import { DataLayer, DataLayerUIOption } from "@/types";
 
 interface DataLayerFilterProps {
     selectedLayers: DataLayer[];
     onLayerChange: (layers: DataLayer[]) => void;
-    defaultSelectAll?: boolean; // New prop to select all by default
+    defaultSelectAll?: boolean;
 }
 
 export default function DataLayerFilter({
@@ -14,14 +14,14 @@ export default function DataLayerFilter({
     onLayerChange,
     defaultSelectAll = false,
 }: DataLayerFilterProps) {
-    // Define the available data layers
-    const dataLayers: {
-        value: DataLayer;
+    // Define the available data layers for UI display
+    const dataLayerOptions: {
+        value: DataLayerUIOption;
         label: string;
         icon: React.ReactNode;
     }[] = [
         {
-            value: "Campaign",
+            value: "campaign",
             label: "キャンペーン (Campaign)",
             icon: (
                 <svg
@@ -40,7 +40,7 @@ export default function DataLayerFilter({
             ),
         },
         {
-            value: "Adgroup",
+            value: "ad_group",
             label: "広告グループ (Ad Group)",
             icon: (
                 <svg
@@ -59,7 +59,7 @@ export default function DataLayerFilter({
             ),
         },
         {
-            value: "Ad",
+            value: "ad",
             label: "広告 (Ad)",
             icon: (
                 <svg
@@ -78,7 +78,7 @@ export default function DataLayerFilter({
             ),
         },
         {
-            value: "Keyword",
+            value: "keyword",
             label: "キーワード (Keyword)",
             icon: (
                 <svg
@@ -98,35 +98,144 @@ export default function DataLayerFilter({
         },
     ];
 
+    // Helper function to check if a layer is selected
+    const isLayerSelected = (layer: DataLayerUIOption): boolean => {
+        if (layer === "campaign" || layer === "ad_group") {
+            // Direct match for campaign or ad_group
+            return selectedLayers.includes(layer);
+        } else if (layer === "ad") {
+            // Ad is selected if either "ad" or "ad_and_keyword" is in the selectedLayers
+            return (
+                selectedLayers.includes("ad") ||
+                selectedLayers.includes("ad_and_keyword")
+            );
+        } else if (layer === "keyword") {
+            // Keyword is selected if either "keyword" or "ad_and_keyword" is in the selectedLayers
+            return (
+                selectedLayers.includes("keyword") ||
+                selectedLayers.includes("ad_and_keyword")
+            );
+        }
+        return false;
+    };
+
+    // Function to handle selection/deselection of a layer with the new logic
+    const handleLayerToggle = (layer: DataLayerUIOption) => {
+        let newLayers: DataLayer[] = [...selectedLayers];
+
+        if (layer === "campaign" || layer === "ad_group") {
+            // If selecting a campaign-level option, clear any ad/keyword selections
+            if (!isLayerSelected(layer)) {
+                // Remove all ad/keyword level selections
+                newLayers = newLayers.filter(
+                    l =>
+                        l !== "ad" && l !== "keyword" && l !== "ad_and_keyword",
+                );
+
+                // Remove other campaign-level option if any
+                newLayers = newLayers.filter(
+                    l => l !== "campaign" && l !== "ad_group",
+                );
+
+                // Add the selected campaign-level option
+                newLayers.push(layer);
+            } else {
+                // Just deselect this layer if it's already selected
+                newLayers = newLayers.filter(l => l !== layer);
+            }
+        } else if (layer === "ad" || layer === "keyword") {
+            // If selecting an ad/keyword-level option, clear any campaign-level selections
+            if (!isLayerSelected(layer)) {
+                // Remove all campaign-level selections
+                newLayers = newLayers.filter(
+                    l => l !== "campaign" && l !== "ad_group",
+                );
+
+                const adSelected = isLayerSelected("ad");
+                const keywordSelected = isLayerSelected("keyword");
+
+                if (layer === "ad") {
+                    if (keywordSelected) {
+                        // If keyword is already selected, add ad_and_keyword instead
+                        newLayers = newLayers.filter(
+                            l => l !== "keyword" && l !== "ad_and_keyword",
+                        );
+                        newLayers.push("ad_and_keyword");
+                    } else {
+                        // Just add ad
+                        newLayers.push("ad");
+                    }
+                } else {
+                    // layer === "keyword"
+                    if (adSelected) {
+                        // If ad is already selected, add ad_and_keyword instead
+                        newLayers = newLayers.filter(
+                            l => l !== "ad" && l !== "ad_and_keyword",
+                        );
+                        newLayers.push("ad_and_keyword");
+                    } else {
+                        // Just add keyword
+                        newLayers.push("keyword");
+                    }
+                }
+            } else {
+                // Deselecting an already selected option
+                if (layer === "ad") {
+                    if (selectedLayers.includes("ad_and_keyword")) {
+                        // If ad_and_keyword is selected, replace with just keyword
+                        newLayers = newLayers.filter(
+                            l => l !== "ad_and_keyword",
+                        );
+                        newLayers.push("keyword");
+                    } else {
+                        // Just remove ad
+                        newLayers = newLayers.filter(l => l !== "ad");
+                    }
+                } else {
+                    // layer === "keyword"
+                    if (selectedLayers.includes("ad_and_keyword")) {
+                        // If ad_and_keyword is selected, replace with just ad
+                        newLayers = newLayers.filter(
+                            l => l !== "ad_and_keyword",
+                        );
+                        newLayers.push("ad");
+                    } else {
+                        // Just remove keyword
+                        newLayers = newLayers.filter(l => l !== "keyword");
+                    }
+                }
+            }
+        }
+
+        onLayerChange(newLayers);
+    };
+
     // Initial select all if defaultSelectAll is true and selectedLayers is empty
     useEffect(() => {
         if (defaultSelectAll && selectedLayers.length === 0) {
-            onLayerChange(dataLayers.map(layer => layer.value));
+            // Default selection: campaign only
+            onLayerChange(["campaign"]);
         }
     }, [defaultSelectAll, selectedLayers.length, onLayerChange]);
 
-    // Toggle a data layer
-    const toggleLayer = (layer: DataLayer) => {
-        const isSelected = selectedLayers.includes(layer);
-
-        if (isSelected) {
-            onLayerChange(selectedLayers.filter(l => l !== layer));
-        } else {
-            onLayerChange([...selectedLayers, layer]);
-        }
+    // Helper to get display name for a layer
+    const getDisplayName = (layer: DataLayer): string => {
+        if (layer === "ad_group") return "Adgroup";
+        if (layer === "ad_and_keyword") return "Ad+Keyword";
+        return layer.charAt(0).toUpperCase() + layer.slice(1);
     };
 
     return (
         <div className="w-full">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                {dataLayers.map(layer => {
-                    const isSelected = selectedLayers.includes(layer.value);
+                {dataLayerOptions.map(layer => {
+                    const isSelected = isLayerSelected(layer.value);
 
                     return (
                         <button
                             key={layer.value}
                             type="button"
-                            onClick={() => toggleLayer(layer.value)}
+                            onClick={() => handleLayerToggle(layer.value)}
                             className={`
                 flex items-center p-3 rounded-lg border shadow-sm transition-all
                 ${
@@ -146,7 +255,10 @@ export default function DataLayerFilter({
                                 {layer.icon}
                             </span>
                             <span className="text-sm font-medium">
-                                {layer.value}
+                                {layer.value === "ad_group"
+                                    ? "Adgroup"
+                                    : layer.value.charAt(0).toUpperCase() +
+                                      layer.value.slice(1)}
                             </span>
                         </button>
                     );
@@ -157,11 +269,11 @@ export default function DataLayerFilter({
             <div className="mt-2 text-xs text-gray-500">
                 {selectedLayers.length === 0
                     ? "データ層が選択されていません (No data layers selected)"
-                    : selectedLayers.length === dataLayers.length
-                    ? "すべてのデータ層が選択されています (All data layers selected)"
-                    : `選択された層: ${selectedLayers.join(
-                          ", ",
-                      )} (Selected layers: ${selectedLayers.join(", ")})`}
+                    : `選択された層: ${selectedLayers
+                          .map(getDisplayName)
+                          .join(", ")} (Selected layers: ${selectedLayers
+                          .map(getDisplayName)
+                          .join(", ")})`}
             </div>
         </div>
     );
