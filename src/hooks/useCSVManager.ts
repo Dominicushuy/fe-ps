@@ -12,7 +12,6 @@ import {
     ValidationError,
     ColumnFilter,
 } from "@/types";
-import { mockCSVData } from "@/data/mock-csv-data";
 import { downloadCSV } from "@/lib/utils/csv-export";
 import { uploadCSVFile, UploadCSVResponse } from "@/lib/api/upload";
 import { createDownloadProcess } from "@/lib/api/param-storage";
@@ -61,14 +60,6 @@ export function useCSVManager() {
 
     // Thêm state cho navigation confirm dialog
     const [showNavigationConfirm, setShowNavigationConfirm] = useState(false);
-
-    // Effect mới để load mock data khi ở chế độ Download
-    useEffect(() => {
-        if (mode === CSVManagerMode.DOWNLOAD) {
-            setData(mockCSVData);
-            setIsValid(true);
-        }
-    }, [mode]);
 
     // Clear selected accounts when client changes
     useEffect(() => {
