@@ -84,7 +84,7 @@ export default function FilterItem({
     };
 
     // Cập nhật giá trị trong filter
-    const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleValueChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
         onFilterChange({
             ...filter,
             value: e.target.value,
@@ -140,13 +140,17 @@ export default function FilterItem({
                     <label className="block text-xs font-medium text-gray-500 mb-1">
                         値 (Value)
                     </label>
-                    <input
-                        type="text"
+                    <textarea
                         value={filter.value}
                         onChange={handleValueChange}
-                        placeholder="値を入力..."
-                        className="block w-full h-10 py-2 px-3 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring focus:ring-primary-200 focus:ring-opacity-50 sm:text-sm transition-all"
+                        placeholder="値を入力... (1行ごとに1つの値)"
+                        className="block w-full min-h-10 py-2 px-3 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring focus:ring-primary-200 focus:ring-opacity-50 sm:text-sm transition-all resize-y"
+                        rows={3}
                     />
+                    <p className="mt-1 text-xs text-gray-400">
+                        各行は別々の値として処理されます (Each line is treated
+                        as a separate value)
+                    </p>
                 </div>
             ) : (
                 <div className="w-full sm:w-1/4 flex items-end">
@@ -154,8 +158,8 @@ export default function FilterItem({
                 </div>
             )}
 
-            {/* Nút xóa filter */}
-            <div className="flex items-end h-10">
+            {/* Nút xóa filter - fixed alignment */}
+            <div className="flex items-start sm:pt-6">
                 <button
                     type="button"
                     onClick={onRemoveFilter}
