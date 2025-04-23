@@ -5,6 +5,7 @@ import DownloadForm from "./DownloadForm";
 import { MediaAccount, DataLayer, ColumnFilter, CSVRow } from "@/types";
 
 interface DownloadSectionProps {
+    clientId: string | null;
     employeeId: string;
     selectedAccounts: MediaAccount[];
     selectedDataLayers: DataLayer[];
@@ -30,6 +31,7 @@ interface DownloadSectionProps {
  * Container component for the Download Mode UI
  */
 const DownloadSection: React.FC<DownloadSectionProps> = ({
+    clientId,
     employeeId,
     selectedAccounts,
     selectedDataLayers,
@@ -47,6 +49,7 @@ const DownloadSection: React.FC<DownloadSectionProps> = ({
         <div className="space-y-6">
             {/* Download Form */}
             <DownloadForm
+                clientId={clientId}
                 employeeId={employeeId}
                 selectedAccounts={selectedAccounts}
                 selectedDataLayers={selectedDataLayers}

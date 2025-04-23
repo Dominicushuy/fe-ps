@@ -16,9 +16,6 @@ import { mockCSVData } from "@/data/mock-csv-data";
 import { downloadCSV } from "@/lib/utils/csv-export";
 import { uploadCSVFile, UploadCSVResponse } from "@/lib/api/upload";
 
-// Define all available data layers
-const ALL_DATA_LAYERS: DataLayer[] = ["Campaign", "Adgroup", "Ad", "Keyword"];
-
 export function useCSVManager() {
     const router = useRouter();
     const [mode, setMode] = useState<CSVManagerMode>(CSVManagerMode.UPLOAD);
@@ -41,10 +38,10 @@ export function useCSVManager() {
         [],
     );
 
-    // Initialize with all data layers selected
-    const [selectedDataLayers, setSelectedDataLayers] = useState<DataLayer[]>([
-        ...ALL_DATA_LAYERS,
-    ]);
+    // Initialize with NO data layers selected (changed from ALL_DATA_LAYERS)
+    const [selectedDataLayers, setSelectedDataLayers] = useState<DataLayer[]>(
+        [],
+    );
 
     // Track the last upload response
     const [lastUploadResponse, setLastUploadResponse] =
@@ -64,13 +61,14 @@ export function useCSVManager() {
         if (mode === CSVManagerMode.DOWNLOAD) {
             setData(mockCSVData);
             setIsValid(true);
-
-            // Ensure all data layers are selected when switching to Download mode
-            if (selectedDataLayers.length === 0) {
-                setSelectedDataLayers([...ALL_DATA_LAYERS]);
-            }
         }
-    }, [mode, selectedDataLayers.length]);
+    }, [mode]);
+
+    // Clear selected accounts when client changes
+    useEffect(() => {
+        // When client changes, reset selected accounts
+        setSelectedAccounts([]);
+    }, [selectedClient?.id]);
 
     // Handler for account selection
     const handleAccountSelect = useCallback((accounts: MediaAccount[]) => {
@@ -114,9 +112,9 @@ export function useCSVManager() {
         setSearchTerm("");
         setCurrentPage(1);
 
-        // Clear account selection, but keep all data layers selected
+        // Clear account selection and data layers
         setSelectedAccounts([]);
-        setSelectedDataLayers([...ALL_DATA_LAYERS]);
+        setSelectedDataLayers([]); // Reset to empty array
     }, []);
 
     const handleClientSelect = useCallback(
@@ -285,6 +283,7 @@ export function useCSVManager() {
         selectedAccounts,
         selectedDataLayers,
         lastUploadResponse,
+        clientId: selectedClient?.id || null, // Add clientId for account filter
         handleModeChange,
         handleClientSelect,
         handleFileSelect,

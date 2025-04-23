@@ -1,8 +1,9 @@
 // src/components/csv-manager/FilterTagsDisplay.tsx
 
 import React from "react";
-import { FunnelIcon } from "@heroicons/react/24/outline";
+import { FunnelIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { MediaAccount, ColumnFilter } from "@/types";
+import MediaLogo from "./MediaLogo";
 
 interface FilterTagsDisplayProps {
     selectedAccounts: MediaAccount[];
@@ -37,6 +38,15 @@ const FilterTagsDisplay: React.FC<FilterTagsDisplayProps> = ({
                             key={account.id}
                             className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
                         >
+                            <MediaLogo
+                                logoPath={account.logoPath}
+                                mediaName={account.mediaName}
+                                size="xs"
+                                className="mr-1"
+                                fallbackIcon={
+                                    <UserCircleIcon className="h-3 w-3 text-green-600" />
+                                }
+                            />
                             {account.accountId} - {account.name}
                         </span>
                     ))}

@@ -12,6 +12,7 @@ import FilterTagsDisplay from "./FilterTagsDisplay";
 import { MediaAccount, DataLayer, ColumnFilter } from "@/types";
 
 interface DownloadFormProps {
+    clientId: string | null;
     employeeId: string;
     selectedAccounts: MediaAccount[];
     selectedDataLayers: DataLayer[];
@@ -30,6 +31,7 @@ interface DownloadFormProps {
  * Form component for configuring CSV download request
  */
 const DownloadForm: React.FC<DownloadFormProps> = ({
+    clientId,
     employeeId,
     selectedAccounts,
     selectedDataLayers,
@@ -113,6 +115,7 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
                             <span className="text-red-500">*</span>
                         </label>
                         <EnhancedAccountFilter
+                            clientId={clientId}
                             selectedAccounts={selectedAccounts}
                             onAccountChange={onAccountChange}
                         />
@@ -124,7 +127,7 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
                         )}
                     </div>
 
-                    {/* Data Layer Filter - Already selected by default */}
+                    {/* Data Layer Filter - No longer selected by default */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                             データ層選択 (Data Layer Selection){" "}
@@ -133,8 +136,14 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
                         <DataLayerFilter
                             selectedLayers={selectedDataLayers}
                             onLayerChange={onDataLayerChange}
-                            defaultSelectAll={true} // Select all by default
+                            defaultSelectAll={false} // Set to false to prevent default selection
                         />
+                        {selectedDataLayers.length === 0 && (
+                            <p className="mt-1 text-sm text-red-500">
+                                少なくとも1つのデータ層を選択してください
+                                (Please select at least one data layer)
+                            </p>
+                        )}
                     </div>
 
                     {/* Advanced Filter Panel */}

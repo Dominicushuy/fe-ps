@@ -15,15 +15,18 @@ export interface Client {
 export interface Media {
     id: string;
     name: string;
+    logoPath?: string;
 }
 
 // Account type (expanded from existing Client type)
+// Updated MediaAccount interface
 export interface MediaAccount {
     id: string;
     mediaId: string;
     mediaName: string;
     accountId: string;
     name: string;
+    logoPath?: string | null; // Add logo path field
 }
 
 // Data layer type with new format matching backend enum

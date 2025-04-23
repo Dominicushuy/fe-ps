@@ -8,11 +8,12 @@ import {
     TableCellsIcon,
 } from "@heroicons/react/24/outline";
 import { Media, MediaAccount, DataLayer } from "@/types";
+import MediaLogo from "./MediaLogo";
 
 interface FilterTagsProps {
-    selectedMedia: Media[];
+    selectedMedia?: Media[];
     selectedAccounts: MediaAccount[];
-    selectedDataLayers: DataLayer[];
+    selectedDataLayers?: DataLayer[];
     onRemoveMedia?: (mediaId: string) => void;
     onRemoveAccount?: (accountId: string) => void;
     onRemoveDataLayer?: (layer: DataLayer) => void;
@@ -20,9 +21,9 @@ interface FilterTagsProps {
 }
 
 export default function FilterTags({
-    selectedMedia,
+    selectedMedia = [],
     selectedAccounts,
-    selectedDataLayers,
+    selectedDataLayers = [],
     onRemoveMedia,
     onRemoveAccount,
     onRemoveDataLayer,
@@ -79,7 +80,15 @@ export default function FilterTags({
                     key={`account-${account.id}`}
                     className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
                 >
-                    <UserCircleIcon className="h-3 w-3 mr-1" />
+                    <MediaLogo
+                        logoPath={account.logoPath}
+                        mediaName={account.mediaName}
+                        size="xs"
+                        className="mr-1"
+                        fallbackIcon={
+                            <UserCircleIcon className="h-3 w-3 text-green-600" />
+                        }
+                    />
                     {account.accountId}
                     {onRemoveAccount && (
                         <button

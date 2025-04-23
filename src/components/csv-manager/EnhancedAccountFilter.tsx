@@ -10,31 +10,29 @@ import {
     NewspaperIcon,
 } from "@heroicons/react/24/outline";
 import { MediaAccount } from "@/types";
-import { mockAccounts } from "@/data/mock-accounts";
-import { mockMediaList } from "@/data/mock-media";
+import { useClientAccounts } from "@/hooks/useClientAccounts";
+import MediaLogo from "./MediaLogo";
 
 interface EnhancedAccountFilterProps {
+    clientId: string | null;
     selectedAccounts: MediaAccount[];
     onAccountChange: (selectedAccounts: MediaAccount[]) => void;
 }
 
 export default function EnhancedAccountFilter({
+    clientId,
     selectedAccounts,
     onAccountChange,
 }: EnhancedAccountFilterProps) {
     const [availableSearchTerm, setAvailableSearchTerm] = useState("");
     const [selectedSearchTerm, setSelectedSearchTerm] = useState("");
 
-    // Get all accounts with media info
-    const allAccounts = useMemo(() => {
-        return mockAccounts.map(account => {
-            const media = mockMediaList.find(m => m.id === account.mediaId);
-            return {
-                ...account,
-                mediaName: media?.name || "Unknown Media",
-            };
-        });
-    }, []);
+    // Use the custom hook to fetch accounts for the selected client
+    const { accounts: allAccounts, isLoading } = useClientAccounts({
+        clientId,
+        limit: 500, // Get a large number of accounts
+        enabled: !!clientId,
+    });
 
     // Create a list of available accounts (filtered by search and not already selected)
     const availableAccounts = useMemo(() => {
@@ -64,17 +62,8 @@ export default function EnhancedAccountFilter({
     const filteredSelectedAccounts = useMemo(() => {
         if (!selectedSearchTerm) return selectedAccounts;
 
-        // Add media name to selected accounts for display
-        const selectedWithMedia = selectedAccounts.map(account => {
-            const media = mockMediaList.find(m => m.id === account.mediaId);
-            return {
-                ...account,
-                mediaName: media?.name || "Unknown Media",
-            };
-        });
-
         const lowerCaseSearch = selectedSearchTerm.toLowerCase();
-        return selectedWithMedia.filter(
+        return selectedAccounts.filter(
             account =>
                 // Search by account ID
                 account.accountId.toLowerCase().includes(lowerCaseSearch) ||
@@ -169,20 +158,67 @@ export default function EnhancedAccountFilter({
 
                     {/* Available accounts list */}
                     <div className="p-2 h-64 overflow-y-auto">
-                        {availableAccounts.length === 0 ? (
+                        {isLoading ? (
+                            <div className="py-4 text-center">
+                                <svg
+                                    className="animate-spin h-5 w-5 text-primary-600 mx-auto"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <circle
+                                        className="opacity-25"
+                                        cx="12"
+                                        cy="12"
+                                        r="10"
+                                        stroke="currentColor"
+                                        strokeWidth="4"
+                                    ></circle>
+                                    <path
+                                        className="opacity-75"
+                                        fill="currentColor"
+                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                    ></path>
+                                </svg>
+                                <p className="mt-2 text-sm text-gray-500">
+                                    ロード中... (Loading...)
+                                </p>
+                            </div>
+                        ) : availableAccounts.length === 0 ? (
                             <div className="py-2 px-3 text-sm text-gray-500 italic text-center">
                                 {availableSearchTerm
                                     ? "検索結果はありません (No search results)"
-                                    : "利用可能なアカウントはありません (No available accounts)"}
+                                    : clientId
+                                    ? "利用可能なアカウントはありません (No available accounts)"
+                                    : "クライアントを選択してください (Please select a client)"}
                             </div>
                         ) : (
                             <ul className="divide-y divide-gray-200">
                                 {availableAccounts.map(account => (
                                     <li key={account.id} className="py-2 px-1">
-                                        <div className="flex justify-between items-center">
+                                        {/* Make the entire row clickable with hover effect */}
+                                        <div
+                                            className="flex justify-between items-center rounded-md hover:bg-gray-100 cursor-pointer transition-colors p-1 group"
+                                            onClick={() =>
+                                                selectAccount(account)
+                                            }
+                                        >
                                             <div className="flex-1">
                                                 <div className="flex items-center">
-                                                    <UserCircleIcon className="h-5 w-5 text-gray-400 mr-2" />
+                                                    {/* Replace UserCircleIcon with MediaLogo */}
+                                                    <MediaLogo
+                                                        logoPath={
+                                                            account.logoPath
+                                                        }
+                                                        mediaName={
+                                                            account.mediaName
+                                                        }
+                                                        size="md" // Use md size (w-6 h-6) instead of sm
+                                                        className="mr-2"
+                                                        fallbackIcon={
+                                                            <UserCircleIcon className="h-6 w-6 text-gray-400" />
+                                                        }
+                                                    />
                                                     <div>
                                                         <p className="text-sm font-medium text-gray-700">
                                                             {account.accountId}{" "}
@@ -204,12 +240,14 @@ export default function EnhancedAccountFilter({
                                                     </div>
                                                 </div>
                                             </div>
+                                            {/* Keep the explicit button for users who prefer to click it directly */}
                                             <button
                                                 type="button"
-                                                onClick={() =>
-                                                    selectAccount(account)
-                                                }
-                                                className="ml-2 flex-shrink-0 p-1 rounded-full text-primary-600 hover:bg-primary-100"
+                                                onClick={e => {
+                                                    e.stopPropagation(); // Prevent triggering the parent onClick
+                                                    selectAccount(account);
+                                                }}
+                                                className="ml-2 flex-shrink-0 p-1 rounded-full text-primary-600 hover:bg-primary-100 group-hover:bg-primary-100 group-hover:text-primary-700"
                                                 title="選択 (Select)"
                                             >
                                                 <ArrowRightIcon className="h-5 w-5" />
@@ -284,20 +322,41 @@ export default function EnhancedAccountFilter({
                             <ul className="divide-y divide-gray-200">
                                 {filteredSelectedAccounts.map(account => (
                                     <li key={account.id} className="py-2 px-1">
-                                        <div className="flex justify-between items-center">
+                                        {/* Make the entire row clickable with hover effect */}
+                                        <div
+                                            className="flex justify-between items-center rounded-md hover:bg-primary-100 cursor-pointer transition-colors p-1 group"
+                                            onClick={() =>
+                                                deselectAccount(account)
+                                            }
+                                        >
+                                            {/* Keep the explicit button for users who prefer to click it directly */}
                                             <button
                                                 type="button"
-                                                onClick={() =>
-                                                    deselectAccount(account)
-                                                }
-                                                className="mr-2 flex-shrink-0 p-1 rounded-full text-red-600 hover:bg-red-100"
+                                                onClick={e => {
+                                                    e.stopPropagation(); // Prevent triggering the parent onClick
+                                                    deselectAccount(account);
+                                                }}
+                                                className="mr-2 flex-shrink-0 p-1 rounded-full text-red-600 hover:bg-red-100 group-hover:bg-red-100 group-hover:text-red-700"
                                                 title="削除 (Remove)"
                                             >
                                                 <ArrowLeftIcon className="h-5 w-5" />
                                             </button>
                                             <div className="flex-1">
                                                 <div className="flex items-center">
-                                                    <UserCircleIcon className="h-5 w-5 text-primary-400 mr-2" />
+                                                    {/* Replace UserCircleIcon with MediaLogo */}
+                                                    <MediaLogo
+                                                        logoPath={
+                                                            account.logoPath
+                                                        }
+                                                        mediaName={
+                                                            account.mediaName
+                                                        }
+                                                        size="md" // Use md size (w-6 h-6) instead of sm
+                                                        className="mr-2"
+                                                        fallbackIcon={
+                                                            <UserCircleIcon className="h-6 w-6 text-primary-400" />
+                                                        }
+                                                    />
                                                     <div>
                                                         <p className="text-sm font-medium text-primary-700">
                                                             {account.accountId}{" "}

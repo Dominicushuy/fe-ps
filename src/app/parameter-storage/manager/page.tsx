@@ -15,6 +15,7 @@ export default function CSVManagerPage() {
     const {
         mode,
         selectedClient,
+        clientId,
         file,
         data,
         isSubmitting,
@@ -150,6 +151,7 @@ export default function CSVManagerPage() {
                 {/* DOWNLOAD MODE */}
                 {mode === CSVManagerMode.DOWNLOAD && (
                     <DownloadSection
+                        clientId={clientId}
                         employeeId={employeeId}
                         selectedAccounts={selectedAccounts}
                         selectedDataLayers={selectedDataLayers}

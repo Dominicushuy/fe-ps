@@ -210,7 +210,8 @@ export default function DataLayerFilter({
         onLayerChange(newLayers);
     };
 
-    // Initial select all if defaultSelectAll is true and selectedLayers is empty
+    // Only initialize default selection if defaultSelectAll is true and selectedLayers is empty
+    // This useEffect is kept but won't do anything by default anymore since defaultSelectAll is now false
     useEffect(() => {
         if (defaultSelectAll && selectedLayers.length === 0) {
             // Default selection: campaign only
