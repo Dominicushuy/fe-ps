@@ -67,19 +67,21 @@ export interface ValidationError {
 
 // Type cho Filter
 export type FilterOperator =
-    | "all" // 全て
-    | "contains" // (複数)テキスト: 含む
-    | "notContains" // (複数)テキスト: 含まない
-    | "startsWith" // (複数)テキスト: 次で始まる
-    | "endsWith" // (複数)テキスト: 次で終わる
-    | "equals" // (複数)テキスト: 等しい
-    | "notEquals" // (複数)テキスト: 等しくない
-    | "containsLowerCase" // (複数)テキスト: 含む(小文字)
-    | "notContainsLowerCase" // (複数)テキスト: 含まない(小文字)
-    | "startsWithLowerCase" // (複数)テキスト: 次で始まる(小文字)
-    | "endsWithLowerCase" // (複数)テキスト: 次で終わる(小文字)
-    | "equalsLowerCase" // (複数)テキスト: 等しい(小文字)
-    | "notEqualsLowerCase" // (複数)テキスト: 等しくない(小文字)
+    | "ALL" // 全て
+    | "CASE_CONTAIN_AND" // (複数)テキスト: 含む AND
+    | "CASE_CONTAIN_OR" // (複数)テキスト: 含む OR
+    | "CASE_NOT_CONTAIN" // (複数)テキスト: 含まない
+    | "CASE_START_WITH" // (複数)テキスト: 次で始まる
+    | "CASE_END_WITH" // (複数)テキスト: 次で終わる
+    | "CASE_EQUAL" // (複数)テキスト: 等しい
+    | "CASE_NOT_EQUAL" // (複数)テキスト: 等しくない
+    | "CONTAIN_AND" // (複数)テキスト: 含む(小文字) AND
+    | "CONTAIN_OR" // (複数)テキスト: 含む(小文字) OR
+    | "NOT_CONTAIN" // (複数)テキスト: 含まない(小文字)
+    | "START_WITH" // (複数)テキスト: 次で始まる(小文字)
+    | "END_WITH" // (複数)テキスト: 次で終わる(小文字)
+    | "EQUAL" // (複数)テキスト: 等しい(小文字)
+    | "NOT_EQUAL" // (複数)テキスト: 等しくない(小文字)
     | "other"; // 上記以外 （残り）
 
 export interface ColumnFilter {

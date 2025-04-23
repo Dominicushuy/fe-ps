@@ -157,7 +157,7 @@ export default function EnhancedAccountFilter({
                     </div>
 
                     {/* Available accounts list */}
-                    <div className="p-2 h-64 overflow-y-auto">
+                    <div className="p-2 h-96 overflow-y-auto">
                         {isLoading ? (
                             <div className="py-4 text-center">
                                 <svg
@@ -311,7 +311,7 @@ export default function EnhancedAccountFilter({
                     </div>
 
                     {/* Selected accounts list */}
-                    <div className="p-2 h-64 overflow-y-auto">
+                    <div className="p-2 h-96 overflow-y-auto">
                         {filteredSelectedAccounts.length === 0 ? (
                             <div className="py-2 px-3 text-sm text-gray-500 italic text-center">
                                 {selectedSearchTerm

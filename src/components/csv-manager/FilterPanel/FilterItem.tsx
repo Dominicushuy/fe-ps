@@ -17,47 +17,58 @@ export default function FilterItem({
 }: FilterItemProps) {
     // Danh sách các toán tử lọc với nhãn tiếng Nhật và tiếng Anh
     const operators: { value: FilterOperator; label: string }[] = [
-        { value: "all", label: "全て (All)" },
-        { value: "contains", label: "(複数)テキスト: 含む (Text: Contains)" },
+        { value: "ALL", label: "全て (All)" },
         {
-            value: "notContains",
+            value: "CASE_CONTAIN_AND",
+            label: "(複数)テキスト: 含む AND (Text: Contains AND)",
+        },
+        {
+            value: "CASE_CONTAIN_OR",
+            label: "(複数)テキスト: 含む OR (Text: Contains OR)",
+        },
+        {
+            value: "CASE_NOT_CONTAIN",
             label: "(複数)テキスト: 含まない (Text: Not Contains)",
         },
         {
-            value: "startsWith",
+            value: "CASE_START_WITH",
             label: "(複数)テキスト: 次で始まる (Text: Starts With)",
         },
         {
-            value: "endsWith",
+            value: "CASE_END_WITH",
             label: "(複数)テキスト: 次で終わる (Text: Ends With)",
         },
-        { value: "equals", label: "(複数)テキスト: 等しい (Text: Equals)" },
+        { value: "CASE_EQUAL", label: "(複数)テキスト: 等しい (Text: Equals)" },
         {
-            value: "notEquals",
+            value: "CASE_NOT_EQUAL",
             label: "(複数)テキスト: 等しくない (Text: Not Equals)",
         },
         {
-            value: "containsLowerCase",
-            label: "(複数)テキスト: 含む(小文字) (Text: Contains - Lowercase)",
+            value: "CONTAIN_AND",
+            label: "(複数)テキスト: 含む(小文字) AND (Text: Contains AND - Lowercase)",
         },
         {
-            value: "notContainsLowerCase",
+            value: "CONTAIN_OR",
+            label: "(複数)テキスト: 含む(小文字) OR (Text: Contains OR - Lowercase)",
+        },
+        {
+            value: "NOT_CONTAIN",
             label: "(複数)テキスト: 含まない(小文字) (Text: Not Contains - Lowercase)",
         },
         {
-            value: "startsWithLowerCase",
+            value: "START_WITH",
             label: "(複数)テキスト: 次で始まる(小文字) (Text: Starts With - Lowercase)",
         },
         {
-            value: "endsWithLowerCase",
+            value: "END_WITH",
             label: "(複数)テキスト: 次で終わる(小文字) (Text: Ends With - Lowercase)",
         },
         {
-            value: "equalsLowerCase",
+            value: "EQUAL",
             label: "(複数)テキスト: 等しい(小文字) (Text: Equals - Lowercase)",
         },
         {
-            value: "notEqualsLowerCase",
+            value: "NOT_EQUAL",
             label: "(複数)テキスト: 等しくない(小文字) (Text: Not Equals - Lowercase)",
         },
         { value: "other", label: "上記以外 （残り） (Other)" },
@@ -93,7 +104,7 @@ export default function FilterItem({
 
     // Kiểm tra xem toán tử có cần giá trị nhập vào không
     const operatorNeedsValue = (operator: FilterOperator): boolean => {
-        return operator !== "all" && operator !== "other";
+        return operator !== "ALL" && operator !== "other";
     };
 
     return (
@@ -175,5 +186,5 @@ export default function FilterItem({
 
 // Export function để kiểm tra xem toán tử có cần giá trị nhập vào không
 export function operatorNeedsValue(operator: FilterOperator): boolean {
-    return operator !== "all" && operator !== "other";
+    return operator !== "ALL" && operator !== "other";
 }

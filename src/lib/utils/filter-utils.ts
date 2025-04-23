@@ -26,63 +26,108 @@ export function applyFilters(
             const filterValue = filter.value;
 
             switch (filter.operator) {
-                case "all":
-                    // Toán tử "all" luôn khớp với tất cả các hàng
+                case "ALL":
+                    // Toán tử "ALL" luôn khớp với tất cả các hàng
                     return true;
 
-                case "equals":
+                case "CASE_EQUAL":
                     return value === filterValue;
 
-                case "notEquals":
+                case "CASE_NOT_EQUAL":
                     return value !== filterValue;
 
-                case "contains":
+                case "CASE_CONTAIN_AND": {
+                    if (typeof value !== "string") return false;
+                    // Split filter value by line and check if ALL values are contained in the text
+                    const andValues = filterValue
+                        .split("\n")
+                        .filter(v => v.trim());
                     return (
-                        typeof value === "string" && value.includes(filterValue)
+                        andValues.length === 0 ||
+                        andValues.every(v => value.includes(v.trim()))
                     );
+                }
 
-                case "notContains":
+                case "CASE_CONTAIN_OR": {
+                    if (typeof value !== "string") return false;
+                    // Split filter value by line and check if ANY value is contained in the text
+                    const orValues = filterValue
+                        .split("\n")
+                        .filter(v => v.trim());
+                    return (
+                        orValues.length === 0 ||
+                        orValues.some(v => value.includes(v.trim()))
+                    );
+                }
+
+                case "CASE_NOT_CONTAIN":
                     return (
                         typeof value === "string" &&
                         !value.includes(filterValue)
                     );
 
-                case "startsWith":
+                case "CASE_START_WITH":
                     return (
                         typeof value === "string" &&
                         value.startsWith(filterValue)
                     );
 
-                case "endsWith":
+                case "CASE_END_WITH":
                     return (
                         typeof value === "string" && value.endsWith(filterValue)
                     );
 
-                case "equalsLowerCase":
+                case "EQUAL":
                     return (
                         typeof value === "string" &&
                         value.toLowerCase() === filterValue.toLowerCase()
                     );
 
-                case "notEqualsLowerCase":
+                case "NOT_EQUAL":
                     return (
                         typeof value === "string" &&
                         value.toLowerCase() !== filterValue.toLowerCase()
                     );
 
-                case "containsLowerCase":
+                case "CONTAIN_AND": {
+                    if (typeof value !== "string") return false;
+                    // Split filter value by line and check if ALL values are contained in the text (case insensitive)
+                    const andLowerValues = filterValue
+                        .split("\n")
+                        .filter(v => v.trim());
                     return (
-                        typeof value === "string" &&
-                        value.toLowerCase().includes(filterValue.toLowerCase())
+                        andLowerValues.length === 0 ||
+                        andLowerValues.every(v =>
+                            value
+                                .toLowerCase()
+                                .includes(v.trim().toLowerCase()),
+                        )
                     );
+                }
 
-                case "notContainsLowerCase":
+                case "CONTAIN_OR": {
+                    if (typeof value !== "string") return false;
+                    // Split filter value by line and check if ANY value is contained in the text (case insensitive)
+                    const orLowerValues = filterValue
+                        .split("\n")
+                        .filter(v => v.trim());
+                    return (
+                        orLowerValues.length === 0 ||
+                        orLowerValues.some(v =>
+                            value
+                                .toLowerCase()
+                                .includes(v.trim().toLowerCase()),
+                        )
+                    );
+                }
+
+                case "NOT_CONTAIN":
                     return (
                         typeof value === "string" &&
                         !value.toLowerCase().includes(filterValue.toLowerCase())
                     );
 
-                case "startsWithLowerCase":
+                case "START_WITH":
                     return (
                         typeof value === "string" &&
                         value
@@ -90,7 +135,7 @@ export function applyFilters(
                             .startsWith(filterValue.toLowerCase())
                     );
 
-                case "endsWithLowerCase":
+                case "END_WITH":
                     return (
                         typeof value === "string" &&
                         value.toLowerCase().endsWith(filterValue.toLowerCase())
@@ -115,7 +160,7 @@ export function createNewFilter(columnName: string): ColumnFilter {
     return {
         id: `filter_${Math.random().toString(36).substr(2, 9)}`,
         columnName,
-        operator: "all",
+        operator: "ALL",
         value: "",
     };
 }
