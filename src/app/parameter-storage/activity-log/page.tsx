@@ -1,5 +1,4 @@
 // src/app/parameter-storage/activity-log/page.tsx
-
 "use client";
 
 import React, { useState } from "react";
@@ -7,8 +6,10 @@ import ClientSelect from "@/components/csv-manager/ClientSelect";
 import DateRangeFilter from "@/components/activity-manager/DateRangeFilter";
 import TypeFilter from "@/components/activity-manager/TypeFilter";
 import StatusFilter from "@/components/activity-manager/StatusFilter";
+import DuplicatableFilter from "@/components/activity-manager/DuplicatableFilter";
 import ActivityTable from "@/components/activity-manager/ActivityTable";
 import Pagination from "@/components/csv-manager/Pagination";
+import SearchBar from "@/components/csv-manager/SearchBar";
 import { useActivityManager } from "@/hooks/useActivityManager";
 import {
     ClipboardDocumentListIcon,
@@ -24,6 +25,8 @@ import {
     XMarkIcon,
     ArrowPathIcon,
     ServerIcon,
+    MagnifyingGlassIcon,
+    DocumentDuplicateIcon,
 } from "@heroicons/react/24/outline";
 import { Activity } from "@/types";
 
@@ -42,15 +45,17 @@ export default function ActivityLogPage() {
         handleCustomDateChange,
         handleTypeChange,
         handleStatusChange,
+        handleDuplicatableChange,
+        handleSearchChange,
         handlePageChange,
         handleItemsPerPageChange,
         fetchActivities,
     } = useActivityManager();
 
-    // State để toggle hiển thị/ẩn bộ lọc trên mobile
+    // State for mobile filters toggle
     const [showFilters, setShowFilters] = useState(false);
 
-    // Handler để refresh dữ liệu
+    // Handler to refresh data
     const handleRefresh = () => {
         fetchActivities();
     };
@@ -90,7 +95,7 @@ export default function ActivityLogPage() {
                 </div>
 
                 <div className="p-4">
-                    {/* Filter toggle button - hiển thị chỉ trên mobile */}
+                    {/* Filter toggle button - only on mobile */}
                     <div className="md:hidden mb-4">
                         <button
                             onClick={() => setShowFilters(!showFilters)}
@@ -110,7 +115,7 @@ export default function ActivityLogPage() {
                         </button>
                     </div>
 
-                    {/* Filter container - redesigned with tabs and better organization */}
+                    {/* Filter container */}
                     <div
                         className={`${
                             showFilters ? "block" : "hidden"
@@ -132,11 +137,26 @@ export default function ActivityLogPage() {
                                     handleDateOptionChange("Last7Days");
                                     handleTypeChange("All");
                                     handleStatusChange("All");
+                                    handleDuplicatableChange(null);
+                                    handleSearchChange("");
                                 }}
                             >
                                 <XMarkIcon className="h-3 w-3 mr-1" />
                                 すべてクリア (Clear All)
                             </button>
+                        </div>
+
+                        {/* Add Search Bar above the filters */}
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                検索 (Search)
+                            </label>
+                            <SearchBar
+                                searchTerm={filters.searchTerm}
+                                onSearch={handleSearchChange}
+                                placeholder="ID、ユーザー名、ファイル名などで検索... (Search by ID, username, filename, etc...)"
+                                debounceMs={500}
+                            />
                         </div>
 
                         {/* Two-column layout for filters on larger screens */}
@@ -164,6 +184,16 @@ export default function ActivityLogPage() {
                                         }
                                         onCustomDateChange={
                                             handleCustomDateChange
+                                        }
+                                    />
+                                </div>
+
+                                {/* DuplicatableFilter - Add to left column */}
+                                <div className="bg-white p-3 rounded-md border border-gray-200 shadow-sm">
+                                    <DuplicatableFilter
+                                        isDuplicatable={filters.isDuplicatable}
+                                        onDuplicatableChange={
+                                            handleDuplicatableChange
                                         }
                                     />
                                 </div>
@@ -200,11 +230,11 @@ export default function ActivityLogPage() {
                             {/* Client filter chip */}
                             <div
                                 className={`px-3 py-1.5 rounded-full text-xs font-medium 
-                                ${
-                                    filters.client
-                                        ? "bg-primary-100 text-primary-800"
-                                        : "bg-gray-100 text-gray-700"
-                                }`}
+                ${
+                    filters.client
+                        ? "bg-primary-100 text-primary-800"
+                        : "bg-gray-100 text-gray-700"
+                }`}
                             >
                                 <span className="mr-1">👤</span>
                                 Client:{" "}
@@ -226,13 +256,13 @@ export default function ActivityLogPage() {
                             {/* Type filter chip */}
                             <div
                                 className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center
-                                ${
-                                    filters.type !== "All"
-                                        ? filters.type === "Download"
-                                            ? "bg-purple-100 text-purple-800"
-                                            : "bg-indigo-100 text-indigo-800"
-                                        : "bg-gray-100 text-gray-700"
-                                }`}
+                ${
+                    filters.type !== "All"
+                        ? filters.type === "Download"
+                            ? "bg-purple-100 text-purple-800"
+                            : "bg-indigo-100 text-indigo-800"
+                        : "bg-gray-100 text-gray-700"
+                }`}
                             >
                                 {filters.type === "Download" ? (
                                     <ArrowDownTrayIcon className="h-3 w-3 mr-1" />
@@ -245,19 +275,19 @@ export default function ActivityLogPage() {
                             {/* Status filter chip */}
                             <div
                                 className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center
-                                ${
-                                    filters.status === "done"
-                                        ? "bg-green-100 text-green-800"
-                                        : filters.status === "processing"
-                                        ? "bg-blue-100 text-blue-800"
-                                        : filters.status === "waiting"
-                                        ? "bg-yellow-100 text-yellow-800"
-                                        : filters.status === "invalid"
-                                        ? "bg-orange-100 text-orange-800"
-                                        : filters.status === "error"
-                                        ? "bg-red-100 text-red-800"
-                                        : "bg-gray-100 text-gray-700"
-                                }`}
+                ${
+                    filters.status === "done"
+                        ? "bg-green-100 text-green-800"
+                        : filters.status === "processing"
+                        ? "bg-blue-100 text-blue-800"
+                        : filters.status === "waiting"
+                        ? "bg-yellow-100 text-yellow-800"
+                        : filters.status === "invalid"
+                        ? "bg-orange-100 text-orange-800"
+                        : filters.status === "error"
+                        ? "bg-red-100 text-red-800"
+                        : "bg-gray-100 text-gray-700"
+                }`}
                             >
                                 {filters.status === "done" ? (
                                     <CheckCircleIcon className="h-3 w-3 mr-1" />
@@ -272,6 +302,23 @@ export default function ActivityLogPage() {
                                 ) : null}
                                 Status: {filters.status}
                             </div>
+
+                            {/* Duplicatable filter chip */}
+                            {filters.isDuplicatable !== null && (
+                                <div className="bg-indigo-100 text-indigo-800 px-3 py-1.5 rounded-full text-xs font-medium flex items-center">
+                                    <DocumentDuplicateIcon className="h-3 w-3 mr-1" />
+                                    Duplicatable:{" "}
+                                    {filters.isDuplicatable ? "Yes" : "No"}
+                                </div>
+                            )}
+
+                            {/* Search term chip */}
+                            {filters.searchTerm && (
+                                <div className="bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-xs font-medium flex items-center">
+                                    <MagnifyingGlassIcon className="h-3 w-3 mr-1" />
+                                    Search: {filters.searchTerm}
+                                </div>
+                            )}
                         </div>
                     </div>
 

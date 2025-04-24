@@ -19,6 +19,9 @@ export interface Activity {
     type: ActivityType;
     s3Link?: string;
     filename?: string;
+    isDuplicatable: boolean;
+    batchId: string | null;
+    downloadLevel: string | null;
 }
 
 export type DateFilterOption =
@@ -35,4 +38,15 @@ export interface ActivityFilters {
     customEndDate: Date | null;
     type: ActivityType | "All";
     status: ActivityStatus | "All";
+}
+
+export interface ActivityFilters {
+    client: Client | null;
+    dateOption: DateFilterOption;
+    customStartDate: Date | null;
+    customEndDate: Date | null;
+    type: ActivityType | "All";
+    status: ActivityStatus | "All";
+    isDuplicatable: boolean | null; // Add this line
+    searchTerm: string; // Add this line
 }

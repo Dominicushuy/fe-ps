@@ -1,5 +1,4 @@
-// /components/activity-manager/ActivityTable.tsx
-
+// src/components/activity-manager/ActivityTable.tsx
 "use client";
 
 import React, { useMemo, useState } from "react";
@@ -14,6 +13,7 @@ import {
     ExclamationTriangleIcon,
     XCircleIcon,
 } from "@heroicons/react/24/outline";
+import { CheckIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { Activity } from "@/types";
 
 interface ActivityTableProps {
@@ -22,7 +22,13 @@ interface ActivityTableProps {
 
 export default function ActivityTable({ activities }: ActivityTableProps) {
     const [sortConfig, setSortConfig] = useState<{
-        key: keyof Activity | "client.name" | null;
+        key:
+            | keyof Activity
+            | "client.name"
+            | "isDuplicatable"
+            | "batchId"
+            | "downloadLevel"
+            | null;
         direction: "ascending" | "descending";
     }>({
         key: "startTime",
@@ -64,6 +70,42 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                         return sortConfig.direction === "ascending" ? 1 : -1;
                     }
                     return 0;
+                } else if (sortConfig.key === "isDuplicatable") {
+                    // Sort by isDuplicatable
+                    const aValue = a.isDuplicatable ? 1 : 0;
+                    const bValue = b.isDuplicatable ? 1 : 0;
+
+                    if (aValue < bValue) {
+                        return sortConfig.direction === "ascending" ? -1 : 1;
+                    }
+                    if (aValue > bValue) {
+                        return sortConfig.direction === "ascending" ? 1 : -1;
+                    }
+                    return 0;
+                } else if (sortConfig.key === "batchId") {
+                    // Sort by batchId
+                    const aValue = a.batchId || "";
+                    const bValue = b.batchId || "";
+
+                    if (aValue < bValue) {
+                        return sortConfig.direction === "ascending" ? -1 : 1;
+                    }
+                    if (aValue > bValue) {
+                        return sortConfig.direction === "ascending" ? 1 : -1;
+                    }
+                    return 0;
+                } else if (sortConfig.key === "downloadLevel") {
+                    // Sort by downloadLevel
+                    const aValue = a.downloadLevel || "";
+                    const bValue = b.downloadLevel || "";
+
+                    if (aValue < bValue) {
+                        return sortConfig.direction === "ascending" ? -1 : 1;
+                    }
+                    if (aValue > bValue) {
+                        return sortConfig.direction === "ascending" ? 1 : -1;
+                    }
+                    return 0;
                 } else {
                     // Sort standard string/number fields
                     const aValue = a[sortConfig.key as keyof Activity] ?? "";
@@ -83,7 +125,14 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
     }, [activities, sortConfig]);
 
     // Sort handler
-    const requestSort = (key: keyof Activity | "client.name") => {
+    const requestSort = (
+        key:
+            | keyof Activity
+            | "client.name"
+            | "isDuplicatable"
+            | "batchId"
+            | "downloadLevel",
+    ) => {
         let direction: "ascending" | "descending" = "ascending";
         if (sortConfig.key === key && sortConfig.direction === "ascending") {
             direction = "descending";
@@ -105,8 +154,6 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
     };
 
     // Render status with icon
-    // Modify the renderStatus function in ActivityTable.tsx
-
     const renderStatus = (status: string) => {
         switch (status) {
             case "done":
@@ -157,9 +204,6 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
             );
             return;
         }
-
-        // In a real application, this would trigger the download process
-        console.log(`Downloading from S3: ${activity.s3Link}`);
 
         // Create a temporary anchor element to trigger download
         const a = document.createElement("a");
@@ -339,6 +383,76 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                                         </span>
                                     </div>
                                 </th>
+                                {/* New Duplicatable column */}
+                                <th
+                                    scope="col"
+                                    className="px-3 py-3.5 text-center text-sm font-semibold text-primary-900 cursor-pointer hover:bg-primary-100 transition-colors"
+                                    onClick={() =>
+                                        requestSort("isDuplicatable")
+                                    }
+                                >
+                                    <div className="group flex items-center justify-center">
+                                        <span>Duplicatable</span>
+                                        <span className="ml-2 flex-none rounded text-primary-500">
+                                            {sortConfig.key ===
+                                            "isDuplicatable" ? (
+                                                sortConfig.direction ===
+                                                "ascending" ? (
+                                                    <ChevronUpIcon className="h-4 w-4" />
+                                                ) : (
+                                                    <ChevronDownIcon className="h-4 w-4" />
+                                                )
+                                            ) : (
+                                                <div className="h-4 w-4" />
+                                            )}
+                                        </span>
+                                    </div>
+                                </th>
+                                {/* New BatchId column */}
+                                <th
+                                    scope="col"
+                                    className="px-3 py-3.5 text-left text-sm font-semibold text-primary-900 cursor-pointer hover:bg-primary-100 transition-colors"
+                                    onClick={() => requestSort("batchId")}
+                                >
+                                    <div className="group flex items-center">
+                                        <span>Batch ID</span>
+                                        <span className="ml-2 flex-none rounded text-primary-500">
+                                            {sortConfig.key === "batchId" ? (
+                                                sortConfig.direction ===
+                                                "ascending" ? (
+                                                    <ChevronUpIcon className="h-4 w-4" />
+                                                ) : (
+                                                    <ChevronDownIcon className="h-4 w-4" />
+                                                )
+                                            ) : (
+                                                <div className="h-4 w-4" />
+                                            )}
+                                        </span>
+                                    </div>
+                                </th>
+                                {/* New DownloadLevel column */}
+                                <th
+                                    scope="col"
+                                    className="px-3 py-3.5 text-left text-sm font-semibold text-primary-900 cursor-pointer hover:bg-primary-100 transition-colors"
+                                    onClick={() => requestSort("downloadLevel")}
+                                >
+                                    <div className="group flex items-center">
+                                        <span>Download Level</span>
+                                        <span className="ml-2 flex-none rounded text-primary-500">
+                                            {sortConfig.key ===
+                                            "downloadLevel" ? (
+                                                sortConfig.direction ===
+                                                "ascending" ? (
+                                                    <ChevronUpIcon className="h-4 w-4" />
+                                                ) : (
+                                                    <ChevronDownIcon className="h-4 w-4" />
+                                                )
+                                            ) : (
+                                                <div className="h-4 w-4" />
+                                            )}
+                                        </span>
+                                    </div>
+                                </th>
                                 {/* Actions column */}
                                 <th
                                     scope="col"
@@ -408,7 +522,42 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                                             </span>
                                         )}
                                     </td>
-                                    {/* Actions cell */}
+                                    {/* Duplicatable cell */}
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-center">
+                                        {activity.isDuplicatable ? (
+                                            <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-green-100 text-green-800">
+                                                <CheckIcon className="h-4 w-4" />
+                                            </span>
+                                        ) : (
+                                            <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-red-100 text-red-800">
+                                                <XMarkIcon className="h-4 w-4" />
+                                            </span>
+                                        )}
+                                    </td>
+                                    {/* Batch ID cell */}
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        {activity.batchId ? (
+                                            <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
+                                                {activity.batchId}
+                                            </span>
+                                        ) : (
+                                            <span className="text-gray-400">
+                                                -
+                                            </span>
+                                        )}
+                                    </td>
+                                    {/* Download Level cell */}
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        {activity.downloadLevel ? (
+                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                                {activity.downloadLevel}
+                                            </span>
+                                        ) : (
+                                            <span className="text-gray-400">
+                                                -
+                                            </span>
+                                        )}
+                                    </td>
                                     {/* Actions cell */}
                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                         {activity.type === "Download" &&

@@ -72,6 +72,9 @@ export function convertApiActivityToActivity(
         filename: apiActivity.file_path
             ? apiActivity.file_path.split("/").pop() || `file-${apiActivity.id}`
             : undefined,
+        isDuplicatable: apiActivity.is_duplicatable || false,
+        batchId: apiActivity.batch_id,
+        downloadLevel: apiActivity.download_level,
     };
 }
 

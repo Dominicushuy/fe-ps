@@ -19,6 +19,8 @@ interface UseActivityQueryParams {
     dateOption: DateFilterOption;
     customStartDate: Date | null;
     customEndDate: Date | null;
+    isDuplicatable: boolean | null;
+    searchTerm: string;
     page: number;
     limit: number;
 }
@@ -100,6 +102,8 @@ export function useActivityQuery({
     dateOption,
     customStartDate,
     customEndDate,
+    isDuplicatable,
+    searchTerm,
     page,
     limit,
 }: UseActivityQueryParams) {
@@ -119,6 +123,8 @@ export function useActivityQuery({
                 dateOption,
                 customStartDate,
                 customEndDate,
+                isDuplicatable,
+                searchTerm,
                 page,
                 limit,
             },
@@ -149,6 +155,16 @@ export function useActivityQuery({
             // Add status filter if selected
             if (status !== "All") {
                 apiFilters.status = status;
+            }
+
+            // Add duplicatable filter if selected
+            if (isDuplicatable !== null) {
+                apiFilters.is_duplicatable = isDuplicatable;
+            }
+
+            // Add search term if provided
+            if (searchTerm) {
+                apiFilters.search = searchTerm;
             }
 
             const response = await fetchActivities(apiFilters);
