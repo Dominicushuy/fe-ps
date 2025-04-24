@@ -15,9 +15,8 @@ export default function FilterItem({
     onFilterChange,
     onRemoveFilter,
 }: FilterItemProps) {
-    // Danh sách các toán tử lọc với nhãn tiếng Nhật và tiếng Anh
+    // Danh sách các toán tử lọc với nhãn tiếng Nhật và tiếng Anh - đã loại bỏ "ALL" và "other"
     const operators: { value: FilterOperator; label: string }[] = [
-        { value: "ALL", label: "全て (All)" },
         {
             value: "CASE_CONTAIN_AND",
             label: "(複数)テキスト: 含む AND (Text: Contains AND)",
@@ -71,7 +70,6 @@ export default function FilterItem({
             value: "NOT_EQUAL",
             label: "(複数)テキスト: 等しくない(小文字) (Text: Not Equals - Lowercase)",
         },
-        { value: "other", label: "上記以外 （残り） (Other)" },
     ];
 
     // Cập nhật tên cột trong filter
@@ -87,10 +85,6 @@ export default function FilterItem({
         onFilterChange({
             ...filter,
             operator: e.target.value as FilterOperator,
-            // Reset giá trị nếu chuyển sang toán tử không cần giá trị
-            value: !operatorNeedsValue(e.target.value as FilterOperator)
-                ? ""
-                : filter.value,
         });
     };
 
@@ -100,11 +94,6 @@ export default function FilterItem({
             ...filter,
             value: e.target.value,
         });
-    };
-
-    // Kiểm tra xem toán tử có cần giá trị nhập vào không
-    const operatorNeedsValue = (operator: FilterOperator): boolean => {
-        return operator !== "ALL" && operator !== "other";
     };
 
     return (
@@ -145,29 +134,23 @@ export default function FilterItem({
                 </select>
             </div>
 
-            {/* Nhập giá trị (nếu toán tử cần giá trị) */}
-            {operatorNeedsValue(filter.operator) ? (
-                <div className="w-full sm:w-1/4">
-                    <label className="block text-xs font-medium text-gray-500 mb-1">
-                        値 (Value)
-                    </label>
-                    <textarea
-                        value={filter.value}
-                        onChange={handleValueChange}
-                        placeholder="値を入力... (1行ごとに1つの値)"
-                        className="block w-full min-h-10 py-2 px-3 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring focus:ring-primary-200 focus:ring-opacity-50 sm:text-sm transition-all resize-y"
-                        rows={3}
-                    />
-                    <p className="mt-1 text-xs text-gray-400">
-                        各行は別々の値として処理されます (Each line is treated
-                        as a separate value)
-                    </p>
-                </div>
-            ) : (
-                <div className="w-full sm:w-1/4 flex items-end">
-                    <div className="h-10"></div>
-                </div>
-            )}
+            {/* Nhập giá trị (luôn hiển thị vì đã bỏ các toán tử không cần value) */}
+            <div className="w-full sm:w-1/4">
+                <label className="block text-xs font-medium text-gray-500 mb-1">
+                    値 (Value)
+                </label>
+                <textarea
+                    value={filter.value}
+                    onChange={handleValueChange}
+                    placeholder="値を入力... (1行ごとに1つの値)"
+                    className="block w-full min-h-10 py-2 px-3 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring focus:ring-primary-200 focus:ring-opacity-50 sm:text-sm transition-all resize-y"
+                    rows={3}
+                />
+                <p className="mt-1 text-xs text-gray-400">
+                    各行は別々の値として処理されます (Each line is treated as a
+                    separate value)
+                </p>
+            </div>
 
             {/* Nút xóa filter - fixed alignment */}
             <div className="flex items-start sm:pt-6">
@@ -182,9 +165,4 @@ export default function FilterItem({
             </div>
         </div>
     );
-}
-
-// Export function để kiểm tra xem toán tử có cần giá trị nhập vào không
-export function operatorNeedsValue(operator: FilterOperator): boolean {
-    return operator !== "ALL" && operator !== "other";
 }

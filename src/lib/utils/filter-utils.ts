@@ -1,8 +1,5 @@
 import { CSVRow, ColumnFilter } from "@/types";
 
-/**
- * Áp dụng tất cả các bộ lọc vào dữ liệu
- */
 export function applyFilters(
     data: CSVRow[],
     filters: ColumnFilter[],
@@ -26,10 +23,7 @@ export function applyFilters(
             const filterValue = filter.value;
 
             switch (filter.operator) {
-                case "ALL":
-                    // Toán tử "ALL" luôn khớp với tất cả các hàng
-                    return true;
-
+                // Removed "ALL" and "other" cases
                 case "CASE_EQUAL":
                     return value === filterValue;
 
@@ -141,11 +135,6 @@ export function applyFilters(
                         value.toLowerCase().endsWith(filterValue.toLowerCase())
                     );
 
-                case "other":
-                    // Trả về true nếu giá trị không khớp với bất kỳ điều kiện nào ở trên
-                    // Có thể cần logic cụ thể hơn tùy theo yêu cầu
-                    return true;
-
                 default:
                     return true;
             }
@@ -154,13 +143,13 @@ export function applyFilters(
 }
 
 /**
- * Tạo một filter mới
+ * Tạo một filter mới - cập nhật để sử dụng toán tử mặc định thay vì "ALL"
  */
 export function createNewFilter(columnName: string): ColumnFilter {
     return {
         id: `filter_${Math.random().toString(36).substr(2, 9)}`,
         columnName,
-        operator: "ALL",
+        operator: "CASE_CONTAIN_OR", // Default to a commonly used operator
         value: "",
     };
 }

@@ -13,13 +13,11 @@ import { MediaAccount, DataLayer, ColumnFilter } from "@/types";
 
 interface DownloadFormProps {
     clientId: string | null;
-    employeeId: string;
     selectedAccounts: MediaAccount[];
     selectedDataLayers: DataLayer[];
     filters: ColumnFilter[];
     isSubmitting: boolean;
     downloadSuccess: boolean;
-    onEmployeeIdChange: (id: string) => void;
     onAccountChange: (accounts: MediaAccount[]) => void;
     onDataLayerChange: (layers: DataLayer[]) => void;
     onFilterChange: (filters: ColumnFilter[]) => void;
@@ -32,24 +30,19 @@ interface DownloadFormProps {
  */
 const DownloadForm: React.FC<DownloadFormProps> = ({
     clientId,
-    employeeId,
     selectedAccounts,
     selectedDataLayers,
     filters,
     isSubmitting,
     downloadSuccess,
-    onEmployeeIdChange,
     onAccountChange,
     onDataLayerChange,
     onFilterChange,
     onClearFilters,
     onSubmit,
 }) => {
-    // Mock columns for advanced filters
+    // Filtered columns list - removed "媒体ID", "CID", "アカウントID", "ドラフト停止日"
     const mockColumns = [
-        "媒体ID",
-        "CID",
-        "アカウントID",
         "キャンペーンID",
         "キャンペーン名",
         "広告グループID",
@@ -57,7 +50,6 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
         "広告ID",
         "キーワードID",
         "パラメ発行済みURL",
-        "ドラフト停止日",
     ];
 
     return (
@@ -83,31 +75,6 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
 
                 {/* Form Fields */}
                 <div className="space-y-6">
-                    {/* Employee ID Field - Required */}
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            社員ID (Employee ID){" "}
-                            <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                            <input
-                                type="text"
-                                value={employeeId}
-                                onChange={e =>
-                                    onEmployeeIdChange(e.target.value)
-                                }
-                                placeholder="社員IDを入力してください (Enter your employee ID)"
-                                className="w-1/2 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm"
-                                required
-                            />
-                            {!employeeId.trim() && (
-                                <p className="mt-1 text-sm text-red-500">
-                                    社員IDは必須です (Employee ID is required)
-                                </p>
-                            )}
-                        </div>
-                    </div>
-
                     {/* Account Filter - Required */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -195,14 +162,12 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
                             disabled={
                                 selectedAccounts.length === 0 ||
                                 selectedDataLayers.length === 0 ||
-                                !employeeId.trim() ||
                                 isSubmitting
                             }
                             className={`inline-flex items-center px-6 py-3 shadow-sm text-sm font-medium rounded-md text-white
                 ${
                     selectedAccounts.length === 0 ||
-                    selectedDataLayers.length === 0 ||
-                    !employeeId.trim()
+                    selectedDataLayers.length === 0
                         ? "bg-gray-400 cursor-not-allowed"
                         : isSubmitting
                         ? "bg-primary-600 opacity-75 cursor-wait"

@@ -29,8 +29,6 @@ export default function CSVManagerPage() {
         showNavigationConfirm,
         selectedAccounts,
         selectedDataLayers,
-        // New state from the hook
-        employeeId,
         isDownloadSubmitting,
         downloadSuccess,
 
@@ -52,8 +50,6 @@ export default function CSVManagerPage() {
         handleDataLayerSelect,
         // New handler from the hook
         handleDownloadSubmit,
-        // New setter from the hook
-        setEmployeeId,
     } = useCSVManager();
 
     // Handler to clear filters
@@ -119,7 +115,6 @@ export default function CSVManagerPage() {
                 {mode === CSVManagerMode.DOWNLOAD && (
                     <DownloadSection
                         clientId={clientId}
-                        employeeId={employeeId}
                         selectedAccounts={selectedAccounts}
                         selectedDataLayers={selectedDataLayers}
                         filters={filters}
@@ -129,7 +124,6 @@ export default function CSVManagerPage() {
                         searchTerm={searchTerm}
                         isSubmitting={isDownloadSubmitting}
                         downloadSuccess={downloadSuccess}
-                        onEmployeeIdChange={setEmployeeId}
                         onAccountChange={handleAccountSelect}
                         onDataLayerChange={handleDataLayerSelect}
                         onFilterChange={handleFilterChange}

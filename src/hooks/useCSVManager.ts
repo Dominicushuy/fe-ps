@@ -217,14 +217,6 @@ export function useCSVManager() {
     );
     // Move the download submit handler to the hook
     const handleDownloadSubmit = useCallback(async () => {
-        // Add validation for employee ID
-        if (!employeeId.trim()) {
-            toast.error(
-                "社員IDを入力してください (Please enter your employee ID)",
-            );
-            return;
-        }
-
         if (selectedAccounts.length === 0) {
             toast.error(
                 "アカウントを選択してください (Please select accounts)",
@@ -249,9 +241,9 @@ export function useCSVManager() {
         setIsDownloadSubmitting(true);
 
         try {
-            // Call the API service to create download process
+            // Sử dụng giá trị mặc định "system" cho employeeId
             const response = await createDownloadProcess(
-                employeeId,
+                "system", // Default employee ID
                 selectedClient?.id || "",
                 accountIds,
                 downloadLevel,
@@ -267,8 +259,7 @@ export function useCSVManager() {
 
             setDownloadSuccess(true);
 
-            // Clear all form fields after successful submission
-            setEmployeeId("");
+            // Clear form fields after successful submission except Employee ID
             setSelectedAccounts([]);
             setSelectedDataLayers([]);
             setFilters([]);
@@ -302,15 +293,13 @@ export function useCSVManager() {
             setIsDownloadSubmitting(false);
         }
     }, [
-        employeeId,
         selectedAccounts,
         selectedDataLayers,
         selectedClient,
         filters,
-        setEmployeeId,
-        setFilters,
         setSelectedAccounts,
         setSelectedDataLayers,
+        setFilters,
         setShowNavigationConfirm,
     ]);
 

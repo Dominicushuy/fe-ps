@@ -6,7 +6,7 @@ import { MediaAccount, DataLayer, ColumnFilter, CSVRow } from "@/types";
 
 interface DownloadSectionProps {
     clientId: string | null;
-    employeeId: string;
+    // Đã bỏ employeeId: string;
     selectedAccounts: MediaAccount[];
     selectedDataLayers: DataLayer[];
     filters: ColumnFilter[];
@@ -16,7 +16,6 @@ interface DownloadSectionProps {
     searchTerm: string;
     isSubmitting: boolean;
     downloadSuccess: boolean;
-    onEmployeeIdChange: (id: string) => void;
     onAccountChange: (accounts: MediaAccount[]) => void;
     onDataLayerChange: (layers: DataLayer[]) => void;
     onFilterChange: (filters: ColumnFilter[]) => void;
@@ -32,13 +31,11 @@ interface DownloadSectionProps {
  */
 const DownloadSection: React.FC<DownloadSectionProps> = ({
     clientId,
-    employeeId,
     selectedAccounts,
     selectedDataLayers,
     filters,
     isSubmitting,
     downloadSuccess,
-    onEmployeeIdChange,
     onAccountChange,
     onDataLayerChange,
     onFilterChange,
@@ -50,13 +47,11 @@ const DownloadSection: React.FC<DownloadSectionProps> = ({
             {/* Download Form */}
             <DownloadForm
                 clientId={clientId}
-                employeeId={employeeId}
                 selectedAccounts={selectedAccounts}
                 selectedDataLayers={selectedDataLayers}
                 filters={filters}
                 isSubmitting={isSubmitting}
                 downloadSuccess={downloadSuccess}
-                onEmployeeIdChange={onEmployeeIdChange}
                 onAccountChange={onAccountChange}
                 onDataLayerChange={onDataLayerChange}
                 onFilterChange={onFilterChange}
