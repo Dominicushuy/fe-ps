@@ -2,8 +2,7 @@
 
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useSearchParams } from "next/navigation";
+import React, { useState } from "react";
 import ClientSelect from "@/components/csv-manager/ClientSelect";
 import DateRangeFilter from "@/components/activity-manager/DateRangeFilter";
 import TypeFilter from "@/components/activity-manager/TypeFilter";
@@ -23,17 +22,18 @@ import {
     ExclamationCircleIcon,
     AdjustmentsHorizontalIcon,
     XMarkIcon,
+    ArrowPathIcon,
+    ServerIcon,
 } from "@heroicons/react/24/outline";
-import { mockClients } from "@/data/mock-clients";
 import { Activity } from "@/types";
 
+// Main component with React Query implementation
 export default function ActivityLogPage() {
-    const searchParams = useSearchParams();
-    const clientIdParam = searchParams.get("clientId");
-
     const {
         filters,
         paginatedData,
+        isLoading,
+        error,
         currentPage,
         itemsPerPage,
         totalItems,
@@ -44,37 +44,46 @@ export default function ActivityLogPage() {
         handleStatusChange,
         handlePageChange,
         handleItemsPerPageChange,
+        fetchActivities,
     } = useActivityManager();
 
     // State để toggle hiển thị/ẩn bộ lọc trên mobile
     const [showFilters, setShowFilters] = useState(false);
-    const [isInitialLoad, setIsInitialLoad] = useState(true);
 
-    // Xử lý clientId từ URL parameters
-    useEffect(() => {
-        if (clientIdParam && isInitialLoad) {
-            // Tìm client trong danh sách clients dựa trên id
-            const client = mockClients.find(c => c.id === clientIdParam);
-
-            if (client) {
-                // Cập nhật filter theo client
-                handleClientSelect(client);
-            }
-
-            setIsInitialLoad(false);
-        }
-    }, [clientIdParam, handleClientSelect, isInitialLoad]);
+    // Handler để refresh dữ liệu
+    const handleRefresh = () => {
+        fetchActivities();
+    };
 
     return (
         <div className="space-y-6">
             <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden">
                 {/* Header */}
                 <div className="bg-primary-700 text-white p-4">
-                    <h2 className="text-xl font-semibold flex items-center">
-                        <ClipboardDocumentListIcon className="h-6 w-6 mr-2" />
-                        アクティビティログ (Activity Log)
-                    </h2>
-                    <p className="text-primary-100 text-sm mt-1">
+                    <div className="flex items-center justify-between mb-2">
+                        <h2 className="text-xl font-semibold flex items-center">
+                            <ClipboardDocumentListIcon className="h-6 w-6 mr-2" />
+                            アクティビティログ (Activity Log)
+                        </h2>
+                        <div className="flex items-center space-x-2">
+                            <span className="text-xs bg-primary-600 px-2 py-1 rounded-full flex items-center">
+                                <ServerIcon className="h-3 w-3 mr-1" />
+                                React Query
+                            </span>
+                            <button
+                                onClick={handleRefresh}
+                                className="p-2 bg-primary-600 rounded-full hover:bg-primary-500 transition-colors"
+                                title="Refresh data"
+                            >
+                                <ArrowPathIcon
+                                    className={`h-5 w-5 text-white ${
+                                        isLoading ? "animate-spin" : ""
+                                    }`}
+                                />
+                            </button>
+                        </div>
+                    </div>
+                    <p className="text-primary-100 text-sm">
                         すべてのアップロードおよびダウンロード操作の履歴
                         (History of all upload and download operations)
                     </p>
@@ -170,7 +179,7 @@ export default function ActivityLogPage() {
                                     />
                                 </div>
 
-                                {/* StatusFilter - Redesigned to use a more compact layout */}
+                                {/* StatusFilter */}
                                 <div className="bg-white p-3 rounded-md border border-gray-200 shadow-sm">
                                     <StatusFilter
                                         selectedStatus={filters.status}
@@ -266,24 +275,73 @@ export default function ActivityLogPage() {
                         </div>
                     </div>
 
-                    {/* Activity Table and remaining content */}
+                    {/* Activity Table with loading states */}
                     <div className="mb-4">
-                        <ActivityTable
-                            activities={paginatedData as Activity[]}
-                        />
+                        {isLoading ? (
+                            <div className="py-12 flex justify-center">
+                                <div className="flex flex-col items-center">
+                                    <ArrowPathIcon className="h-8 w-8 text-primary-600 animate-spin" />
+                                    <p className="mt-2 text-sm text-gray-600">
+                                        データを読み込んでいます... (Loading
+                                        data...)
+                                    </p>
+                                </div>
+                            </div>
+                        ) : error ? (
+                            <div className="py-12 flex justify-center">
+                                <div className="flex flex-col items-center text-center max-w-md">
+                                    <ExclamationCircleIcon className="h-12 w-12 text-red-500" />
+                                    <p className="mt-2 text-lg font-medium text-red-800">
+                                        エラーが発生しました (An error occurred)
+                                    </p>
+                                    <p className="mt-1 text-sm text-gray-600">
+                                        {error instanceof Error
+                                            ? error.message
+                                            : "Unknown error"}
+                                    </p>
+                                    <button
+                                        onClick={handleRefresh}
+                                        className="mt-4 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
+                                    >
+                                        再試行 (Retry)
+                                    </button>
+                                </div>
+                            </div>
+                        ) : paginatedData.length === 0 ? (
+                            <div className="py-12 flex justify-center">
+                                <div className="flex flex-col items-center text-center max-w-md">
+                                    <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400" />
+                                    <p className="mt-2 text-lg font-medium text-gray-700">
+                                        アクティビティがありません (No
+                                        activities found)
+                                    </p>
+                                    <p className="mt-1 text-sm text-gray-500">
+                                        フィルターを変更して再試行してください。
+                                        (Try changing your filters and try
+                                        again.)
+                                    </p>
+                                </div>
+                            </div>
+                        ) : (
+                            <ActivityTable
+                                activities={paginatedData as Activity[]}
+                            />
+                        )}
                     </div>
 
-                    {/* Pagination */}
-                    <div className="mt-4">
-                        <Pagination
-                            currentPage={currentPage}
-                            itemsPerPage={itemsPerPage}
-                            totalItems={totalItems}
-                            onPageChange={handlePageChange}
-                            onItemsPerPageChange={handleItemsPerPageChange}
-                            maxPageButtons={5}
-                        />
-                    </div>
+                    {/* Pagination - only show when we have data */}
+                    {!isLoading && !error && paginatedData.length > 0 && (
+                        <div className="mt-4">
+                            <Pagination
+                                currentPage={currentPage}
+                                itemsPerPage={itemsPerPage}
+                                totalItems={totalItems}
+                                onPageChange={handlePageChange}
+                                onItemsPerPageChange={handleItemsPerPageChange}
+                                maxPageButtons={5}
+                            />
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
