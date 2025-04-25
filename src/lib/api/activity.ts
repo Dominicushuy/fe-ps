@@ -12,7 +12,7 @@ export interface ActivityFilters {
     client_id?: string;
     action_type?: string;
     status?: string;
-    is_duplicatable?: boolean;
+    is_duplicatable?: boolean; // Vẫn giữ lại định nghĩa vì API vẫn có thể nhận tham số này
     page?: number;
     limit?: number;
 }

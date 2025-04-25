@@ -19,8 +19,8 @@ export interface Activity {
     type: ActivityType;
     s3Link?: string;
     filename?: string;
-    isDuplicatable: boolean;
-    batchId: string | null;
+    isDuplicatable: boolean; // Vẫn giữ lại ở model vì API vẫn trả về
+    batchId: string | null; // Vẫn giữ lại ở model vì API vẫn trả về
     downloadLevel: string | null;
 }
 
@@ -38,15 +38,5 @@ export interface ActivityFilters {
     customEndDate: Date | null;
     type: ActivityType | "All";
     status: ActivityStatus | "All";
-}
-
-export interface ActivityFilters {
-    client: Client | null;
-    dateOption: DateFilterOption;
-    customStartDate: Date | null;
-    customEndDate: Date | null;
-    type: ActivityType | "All";
-    status: ActivityStatus | "All";
-    isDuplicatable: boolean | null; // Add this line
-    searchTerm: string; // Add this line
+    searchTerm: string;
 }

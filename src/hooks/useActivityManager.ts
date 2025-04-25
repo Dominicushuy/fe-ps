@@ -29,7 +29,6 @@ export const useActivityManager = () => {
         customEndDate: null,
         type: "All",
         status: "All",
-        isDuplicatable: null,
         searchTerm: "",
     });
 
@@ -121,13 +120,6 @@ export const useActivityManager = () => {
         setCurrentPage(1);
     }, []);
 
-    const handleDuplicatableChange = useCallback(
-        (isDuplicatable: boolean | null) => {
-            setFilters(prev => ({ ...prev, isDuplicatable }));
-        },
-        [],
-    );
-
     const handleSearchChange = useCallback((searchTerm: string) => {
         setFilters(prev => ({ ...prev, searchTerm }));
     }, []);
@@ -145,7 +137,6 @@ export const useActivityManager = () => {
         dateOption: filters.dateOption,
         customStartDate: filters.customStartDate,
         customEndDate: filters.customEndDate,
-        isDuplicatable: filters.isDuplicatable,
         searchTerm: filters.searchTerm,
         page: currentPage,
         limit: itemsPerPage,
@@ -166,7 +157,6 @@ export const useActivityManager = () => {
         handleStatusChange,
         handlePageChange,
         handleItemsPerPageChange,
-        handleDuplicatableChange,
         handleSearchChange,
         fetchActivities: refetch,
         isLoadingClients,

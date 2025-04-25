@@ -6,7 +6,6 @@ import ClientSelect from "@/components/csv-manager/ClientSelect";
 import DateRangeFilter from "@/components/activity-manager/DateRangeFilter";
 import TypeFilter from "@/components/activity-manager/TypeFilter";
 import StatusFilter from "@/components/activity-manager/StatusFilter";
-import DuplicatableFilter from "@/components/activity-manager/DuplicatableFilter";
 import ActivityTable from "@/components/activity-manager/ActivityTable";
 import Pagination from "@/components/csv-manager/Pagination";
 import SearchBar from "@/components/csv-manager/SearchBar";
@@ -26,7 +25,6 @@ import {
     ArrowPathIcon,
     ServerIcon,
     MagnifyingGlassIcon,
-    DocumentDuplicateIcon,
 } from "@heroicons/react/24/outline";
 import { Activity } from "@/types";
 
@@ -45,7 +43,6 @@ export default function ActivityLogPage() {
         handleCustomDateChange,
         handleTypeChange,
         handleStatusChange,
-        handleDuplicatableChange,
         handleSearchChange,
         handlePageChange,
         handleItemsPerPageChange,
@@ -137,7 +134,6 @@ export default function ActivityLogPage() {
                                     handleDateOptionChange("Last7Days");
                                     handleTypeChange("All");
                                     handleStatusChange("All");
-                                    handleDuplicatableChange(null);
                                     handleSearchChange("");
                                 }}
                             >
@@ -184,16 +180,6 @@ export default function ActivityLogPage() {
                                         }
                                         onCustomDateChange={
                                             handleCustomDateChange
-                                        }
-                                    />
-                                </div>
-
-                                {/* DuplicatableFilter - Add to left column */}
-                                <div className="bg-white p-3 rounded-md border border-gray-200 shadow-sm">
-                                    <DuplicatableFilter
-                                        isDuplicatable={filters.isDuplicatable}
-                                        onDuplicatableChange={
-                                            handleDuplicatableChange
                                         }
                                     />
                                 </div>
@@ -302,15 +288,6 @@ export default function ActivityLogPage() {
                                 ) : null}
                                 Status: {filters.status}
                             </div>
-
-                            {/* Duplicatable filter chip */}
-                            {filters.isDuplicatable !== null && (
-                                <div className="bg-indigo-100 text-indigo-800 px-3 py-1.5 rounded-full text-xs font-medium flex items-center">
-                                    <DocumentDuplicateIcon className="h-3 w-3 mr-1" />
-                                    Duplicatable:{" "}
-                                    {filters.isDuplicatable ? "Yes" : "No"}
-                                </div>
-                            )}
 
                             {/* Search term chip */}
                             {filters.searchTerm && (

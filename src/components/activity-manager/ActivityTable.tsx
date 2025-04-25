@@ -10,10 +10,8 @@ import {
     ArrowDownTrayIcon,
     ArrowUpTrayIcon,
     DocumentArrowDownIcon,
-    ExclamationTriangleIcon,
     XCircleIcon,
 } from "@heroicons/react/24/outline";
-import { CheckIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import { Activity } from "@/types";
 
 interface ActivityTableProps {
@@ -22,13 +20,7 @@ interface ActivityTableProps {
 
 export default function ActivityTable({ activities }: ActivityTableProps) {
     const [sortConfig, setSortConfig] = useState<{
-        key:
-            | keyof Activity
-            | "client.name"
-            | "isDuplicatable"
-            | "batchId"
-            | "downloadLevel"
-            | null;
+        key: keyof Activity | "client.name" | "downloadLevel" | null;
         direction: "ascending" | "descending";
     }>({
         key: "startTime",
@@ -70,30 +62,6 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                         return sortConfig.direction === "ascending" ? 1 : -1;
                     }
                     return 0;
-                } else if (sortConfig.key === "isDuplicatable") {
-                    // Sort by isDuplicatable
-                    const aValue = a.isDuplicatable ? 1 : 0;
-                    const bValue = b.isDuplicatable ? 1 : 0;
-
-                    if (aValue < bValue) {
-                        return sortConfig.direction === "ascending" ? -1 : 1;
-                    }
-                    if (aValue > bValue) {
-                        return sortConfig.direction === "ascending" ? 1 : -1;
-                    }
-                    return 0;
-                } else if (sortConfig.key === "batchId") {
-                    // Sort by batchId
-                    const aValue = a.batchId || "";
-                    const bValue = b.batchId || "";
-
-                    if (aValue < bValue) {
-                        return sortConfig.direction === "ascending" ? -1 : 1;
-                    }
-                    if (aValue > bValue) {
-                        return sortConfig.direction === "ascending" ? 1 : -1;
-                    }
-                    return 0;
                 } else if (sortConfig.key === "downloadLevel") {
                     // Sort by downloadLevel
                     const aValue = a.downloadLevel || "";
@@ -126,12 +94,7 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
 
     // Sort handler
     const requestSort = (
-        key:
-            | keyof Activity
-            | "client.name"
-            | "isDuplicatable"
-            | "batchId"
-            | "downloadLevel",
+        key: keyof Activity | "client.name" | "downloadLevel",
     ) => {
         let direction: "ascending" | "descending" = "ascending";
         if (sortConfig.key === key && sortConfig.direction === "ascending") {
@@ -383,54 +346,7 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                                         </span>
                                     </div>
                                 </th>
-                                {/* New Duplicatable column */}
-                                <th
-                                    scope="col"
-                                    className="px-3 py-3.5 text-center text-sm font-semibold text-primary-900 cursor-pointer hover:bg-primary-100 transition-colors"
-                                    onClick={() =>
-                                        requestSort("isDuplicatable")
-                                    }
-                                >
-                                    <div className="group flex items-center justify-center">
-                                        <span>Duplicatable</span>
-                                        <span className="ml-2 flex-none rounded text-primary-500">
-                                            {sortConfig.key ===
-                                            "isDuplicatable" ? (
-                                                sortConfig.direction ===
-                                                "ascending" ? (
-                                                    <ChevronUpIcon className="h-4 w-4" />
-                                                ) : (
-                                                    <ChevronDownIcon className="h-4 w-4" />
-                                                )
-                                            ) : (
-                                                <div className="h-4 w-4" />
-                                            )}
-                                        </span>
-                                    </div>
-                                </th>
-                                {/* New BatchId column */}
-                                <th
-                                    scope="col"
-                                    className="px-3 py-3.5 text-left text-sm font-semibold text-primary-900 cursor-pointer hover:bg-primary-100 transition-colors"
-                                    onClick={() => requestSort("batchId")}
-                                >
-                                    <div className="group flex items-center">
-                                        <span>Batch ID</span>
-                                        <span className="ml-2 flex-none rounded text-primary-500">
-                                            {sortConfig.key === "batchId" ? (
-                                                sortConfig.direction ===
-                                                "ascending" ? (
-                                                    <ChevronUpIcon className="h-4 w-4" />
-                                                ) : (
-                                                    <ChevronDownIcon className="h-4 w-4" />
-                                                )
-                                            ) : (
-                                                <div className="h-4 w-4" />
-                                            )}
-                                        </span>
-                                    </div>
-                                </th>
-                                {/* New DownloadLevel column */}
+                                {/* Download Level column */}
                                 <th
                                     scope="col"
                                     className="px-3 py-3.5 text-left text-sm font-semibold text-primary-900 cursor-pointer hover:bg-primary-100 transition-colors"
@@ -456,10 +372,10 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                                 {/* Actions column */}
                                 <th
                                     scope="col"
-                                    className="px-3 py-3.5 text-left text-sm font-semibold text-primary-900"
+                                    className="px-3 py-3.5 text-center text-sm font-semibold text-primary-900"
                                 >
-                                    <div className="group flex items-center">
-                                        <span>Actions</span>
+                                    <div className="group flex items-center justify-center">
+                                        <span>Action</span>
                                     </div>
                                 </th>
                             </tr>
@@ -522,30 +438,6 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                                             </span>
                                         )}
                                     </td>
-                                    {/* Duplicatable cell */}
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-center">
-                                        {activity.isDuplicatable ? (
-                                            <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-green-100 text-green-800">
-                                                <CheckIcon className="h-4 w-4" />
-                                            </span>
-                                        ) : (
-                                            <span className="inline-flex items-center justify-center h-6 w-6 rounded-full bg-red-100 text-red-800">
-                                                <XMarkIcon className="h-4 w-4" />
-                                            </span>
-                                        )}
-                                    </td>
-                                    {/* Batch ID cell */}
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                        {activity.batchId ? (
-                                            <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
-                                                {activity.batchId}
-                                            </span>
-                                        ) : (
-                                            <span className="text-gray-400">
-                                                -
-                                            </span>
-                                        )}
-                                    </td>
                                     {/* Download Level cell */}
                                     <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                         {activity.downloadLevel ? (
@@ -558,57 +450,26 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                                             </span>
                                         )}
                                     </td>
-                                    {/* Actions cell */}
-                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                        {activity.type === "Download" &&
-                                        activity.status === "done" ? (
-                                            activity.s3Link ? (
-                                                <button
-                                                    onClick={() =>
-                                                        handleDownload(activity)
-                                                    }
-                                                    className="inline-flex items-center rounded-md bg-primary-50 px-2.5 py-1.5 text-xs font-medium text-primary-700 hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-1 transition-colors"
-                                                    title="ファイルをダウンロード (Download file)"
-                                                >
-                                                    <DocumentArrowDownIcon className="h-4 w-4 mr-1" />
-                                                    ダウンロード
-                                                </button>
-                                            ) : (
-                                                <span className="inline-flex items-center text-xs text-amber-600">
-                                                    <ExclamationTriangleIcon className="h-4 w-4 mr-1" />
-                                                    リンク切れ
-                                                </span>
-                                            )
-                                        ) : activity.type === "Download" &&
-                                          (activity.status === "error" ||
-                                              activity.status === "invalid") ? (
-                                            <button
-                                                onClick={() =>
-                                                    alert(
-                                                        "処理に失敗しました。後でもう一度お試しください。(The process failed. Please try again later.)",
-                                                    )
-                                                }
-                                                className="inline-flex items-center rounded-md bg-red-50 px-2.5 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-1 transition-colors"
-                                                title="ダウンロードを再試行 (Retry download)"
-                                            >
-                                                <DocumentArrowDownIcon className="h-4 w-4 mr-1" />
-                                                再試行
-                                            </button>
-                                        ) : activity.type === "Download" &&
-                                          (activity.status === "processing" ||
-                                              activity.status === "waiting") ? (
-                                            <span className="inline-flex items-center text-xs text-blue-500">
-                                                <ClockIcon className="h-4 w-4 mr-1 animate-spin" />
-                                                {activity.status ===
-                                                "processing"
-                                                    ? "処理中..."
-                                                    : "待機中..."}
-                                            </span>
-                                        ) : (
-                                            <span className="text-gray-400 text-xs">
-                                                -
-                                            </span>
-                                        )}
+                                    {/* Actions cell - simplified to a single square icon */}
+                                    <td className="whitespace-nowrap px-3 py-4 text-sm text-center">
+                                        <button
+                                            onClick={() =>
+                                                handleDownload(activity)
+                                            }
+                                            className={`p-2 rounded ${
+                                                activity.s3Link
+                                                    ? "bg-primary-600 text-white hover:bg-primary-700"
+                                                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                                            } transition-colors`}
+                                            disabled={!activity.s3Link}
+                                            title={
+                                                activity.s3Link
+                                                    ? "ダウンロード (Download)"
+                                                    : "ダウンロード不可 (Download unavailable)"
+                                            }
+                                        >
+                                            <DocumentArrowDownIcon className="h-5 w-5" />
+                                        </button>
                                     </td>
                                 </tr>
                             ))}
