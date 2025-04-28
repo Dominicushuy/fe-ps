@@ -139,12 +139,6 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
                                         (Request successfully submitted)
                                     </p>
                                     <p className="text-xs text-green-700 mt-1">
-                                        データはバックグラウンドで処理されています。処理が完了するとメールで通知されます。
-                                        (Data is being processed in the
-                                        background. You will be notified by
-                                        email when processing is complete)
-                                    </p>
-                                    <p className="text-xs text-green-700 mt-1">
                                         アクティビティログでプロセスの状態を確認できます。
                                         (You can check the process status in the
                                         Activity Log)
