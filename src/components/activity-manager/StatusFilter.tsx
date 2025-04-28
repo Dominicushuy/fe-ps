@@ -10,6 +10,7 @@ import {
     XCircleIcon,
 } from "@heroicons/react/24/outline";
 import { ActivityStatus } from "@/types/activity-types";
+import { useTranslations } from "next-intl";
 
 interface StatusFilterProps {
     selectedStatus: ActivityStatus | "All";
@@ -20,46 +21,48 @@ export default function StatusFilter({
     selectedStatus,
     onStatusChange,
 }: StatusFilterProps) {
+    const t = useTranslations();
+
     // Define the status options with their icons and styling
     const statusOptions = [
         {
             value: "All",
-            label: "All",
+            label: t("all"),
             icon: null,
             activeClass: "bg-primary-600 text-white",
             inactiveClass: "bg-gray-100 text-gray-700 hover:bg-gray-200",
         },
         {
             value: "waiting",
-            label: "Waiting",
+            label: t("waiting"),
             icon: <ClockIcon className="h-3 w-3 mr-1" />,
             activeClass: "bg-yellow-600 text-white",
             inactiveClass: "bg-yellow-50 text-yellow-700 hover:bg-yellow-100",
         },
         {
             value: "processing",
-            label: "Processing",
+            label: t("processing"),
             icon: <ClockIcon className="h-3 w-3 mr-1" />,
             activeClass: "bg-blue-600 text-white",
             inactiveClass: "bg-blue-50 text-blue-700 hover:bg-blue-100",
         },
         {
             value: "done",
-            label: "Done",
+            label: t("done"),
             icon: <CheckCircleIcon className="h-3 w-3 mr-1" />,
             activeClass: "bg-green-600 text-white",
             inactiveClass: "bg-green-50 text-green-700 hover:bg-green-100",
         },
         {
             value: "invalid",
-            label: "Invalid",
+            label: t("invalid"),
             icon: <XCircleIcon className="h-3 w-3 mr-1" />,
             activeClass: "bg-orange-600 text-white",
             inactiveClass: "bg-orange-50 text-orange-700 hover:bg-orange-100",
         },
         {
             value: "error",
-            label: "Error",
+            label: t("error"),
             icon: <ExclamationCircleIcon className="h-3 w-3 mr-1" />,
             activeClass: "bg-red-600 text-white",
             inactiveClass: "bg-red-50 text-red-700 hover:bg-red-100",
@@ -69,7 +72,7 @@ export default function StatusFilter({
     return (
         <div className="w-full">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-                ステータスフィルター (Status Filter)
+                {t("statusFilter")}
             </label>
 
             {/* Grid layout for status buttons */}

@@ -13,12 +13,14 @@ import {
     XCircleIcon,
 } from "@heroicons/react/24/outline";
 import { Activity } from "@/types";
+import { useTranslations } from "next-intl";
 
 interface ActivityTableProps {
     activities: Activity[];
 }
 
 export default function ActivityTable({ activities }: ActivityTableProps) {
+    const t = useTranslations();
     const [sortConfig, setSortConfig] = useState<{
         key: keyof Activity | "client.name" | "downloadLevel" | null;
         direction: "ascending" | "descending";
@@ -123,35 +125,35 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                 return (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                         <CheckCircleIcon className="mr-1 h-4 w-4 text-green-500" />
-                        完了
+                        {t("done")}
                     </span>
                 );
             case "processing":
                 return (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                         <ClockIcon className="mr-1 h-4 w-4 text-blue-500 animate-spin" />
-                        処理中
+                        {t("processing")}
                     </span>
                 );
             case "waiting":
                 return (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
                         <ClockIcon className="mr-1 h-4 w-4 text-yellow-500" />
-                        待機中
+                        {t("waiting")}
                     </span>
                 );
             case "invalid":
                 return (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
                         <XCircleIcon className="mr-1 h-4 w-4 text-orange-500" />
-                        無効
+                        {t("invalid")}
                     </span>
                 );
             case "error":
                 return (
                     <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
                         <ExclamationCircleIcon className="mr-1 h-4 w-4 text-red-500" />
-                        エラー
+                        {t("error")}
                     </span>
                 );
             default:
@@ -162,9 +164,7 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
     // Handle download button click
     const handleDownload = (activity: Activity) => {
         if (!activity.s3Link) {
-            alert(
-                "ダウンロードリンクが利用できません。(Download link unavailable.)",
-            );
+            alert(t("downloadLinkUnavailable"));
             return;
         }
 
@@ -181,9 +181,7 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
     if (activities.length === 0) {
         return (
             <div className="text-center py-10 border rounded-lg">
-                <p className="text-gray-500">
-                    アクティビティがありません (No activities available)
-                </p>
+                <p className="text-gray-500">{t("noActivitiesAvailable")}</p>
             </div>
         );
     }
@@ -201,7 +199,7 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                                     onClick={() => requestSort("startTime")}
                                 >
                                     <div className="group flex items-center">
-                                        <span>Start Time</span>
+                                        <span>{t("startTime")}</span>
                                         <span className="ml-2 flex-none rounded text-primary-500">
                                             {sortConfig.key === "startTime" ? (
                                                 sortConfig.direction ===
@@ -222,7 +220,7 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                                     onClick={() => requestSort("endTime")}
                                 >
                                     <div className="group flex items-center">
-                                        <span>End Time</span>
+                                        <span>{t("endTime")}</span>
                                         <span className="ml-2 flex-none rounded text-primary-500">
                                             {sortConfig.key === "endTime" ? (
                                                 sortConfig.direction ===
@@ -243,7 +241,7 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                                     onClick={() => requestSort("client.name")}
                                 >
                                     <div className="group flex items-center">
-                                        <span>Client</span>
+                                        <span>{t("client")}</span>
                                         <span className="ml-2 flex-none rounded text-primary-500">
                                             {sortConfig.key ===
                                             "client.name" ? (
@@ -265,7 +263,7 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                                     onClick={() => requestSort("type")}
                                 >
                                     <div className="group flex items-center">
-                                        <span>Type</span>
+                                        <span>{t("type")}</span>
                                         <span className="ml-2 flex-none rounded text-primary-500">
                                             {sortConfig.key === "type" ? (
                                                 sortConfig.direction ===
@@ -286,7 +284,7 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                                     onClick={() => requestSort("status")}
                                 >
                                     <div className="group flex items-center">
-                                        <span>Status</span>
+                                        <span>{t("status")}</span>
                                         <span className="ml-2 flex-none rounded text-primary-500">
                                             {sortConfig.key === "status" ? (
                                                 sortConfig.direction ===
@@ -307,7 +305,7 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                                     onClick={() => requestSort("user")}
                                 >
                                     <div className="group flex items-center">
-                                        <span>User</span>
+                                        <span>{t("user")}</span>
                                         <span className="ml-2 flex-none rounded text-primary-500">
                                             {sortConfig.key === "user" ? (
                                                 sortConfig.direction ===
@@ -331,7 +329,7 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                                     }
                                 >
                                     <div className="group flex items-center">
-                                        <span>File</span>
+                                        <span>{t("file")}</span>
                                         <span className="ml-2 flex-none rounded text-primary-500">
                                             {sortConfig.key === "filename" ? (
                                                 sortConfig.direction ===
@@ -353,7 +351,7 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                                     onClick={() => requestSort("downloadLevel")}
                                 >
                                     <div className="group flex items-center">
-                                        <span>Download Level</span>
+                                        <span>{t("downloadLevel")}</span>
                                         <span className="ml-2 flex-none rounded text-primary-500">
                                             {sortConfig.key ===
                                             "downloadLevel" ? (
@@ -375,7 +373,7 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                                     className="px-3 py-3.5 text-center text-sm font-semibold text-primary-900"
                                 >
                                     <div className="group flex items-center justify-center">
-                                        <span>Action</span>
+                                        <span>{t("action")}</span>
                                     </div>
                                 </th>
                             </tr>
@@ -410,12 +408,12 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                                         {activity.type === "Download" ? (
                                             <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-600/20">
                                                 <ArrowDownTrayIcon className="h-3 w-3 mr-1" />
-                                                ダウンロード
+                                                {t("download")}
                                             </span>
                                         ) : (
                                             <span className="inline-flex items-center rounded-md bg-purple-50 px-2 py-1 text-xs font-medium text-purple-700 ring-1 ring-inset ring-purple-600/20">
                                                 <ArrowUpTrayIcon className="h-3 w-3 mr-1" />
-                                                アップロード
+                                                {t("upload")}
                                             </span>
                                         )}
                                     </td>
@@ -464,8 +462,8 @@ export default function ActivityTable({ activities }: ActivityTableProps) {
                                             disabled={!activity.s3Link}
                                             title={
                                                 activity.s3Link
-                                                    ? "ダウンロード (Download)"
-                                                    : "ダウンロード不可 (Download unavailable)"
+                                                    ? t("download")
+                                                    : t("downloadUnavailable")
                                             }
                                         >
                                             <DocumentArrowDownIcon className="h-5 w-5" />

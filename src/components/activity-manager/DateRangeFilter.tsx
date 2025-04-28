@@ -5,6 +5,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { CalendarIcon } from "@heroicons/react/24/outline";
 import { DateFilterOption } from "@/types/activity-types";
+import { useTranslations } from "next-intl";
 
 interface DateRangeFilterProps {
     dateOption: DateFilterOption;
@@ -21,10 +22,11 @@ export default function DateRangeFilter({
     onDateOptionChange,
     onCustomDateChange,
 }: DateRangeFilterProps) {
+    const t = useTranslations();
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
-    // Xử lý đóng dropdown khi click ngoài
+    // Handle clicking outside to close dropdown
     useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
             if (
@@ -35,7 +37,7 @@ export default function DateRangeFilter({
             }
         }
 
-        // Đăng ký sự kiện khi dropdown mở
+        // Register event when dropdown is open
         if (isOpen) {
             document.addEventListener("mousedown", handleClickOutside);
         }
@@ -44,35 +46,35 @@ export default function DateRangeFilter({
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
         };
-    }, [isOpen]); // Chỉ chạy lại effect khi isOpen thay đổi
+    }, [isOpen]);
 
     const formatDate = (date: Date | null) => {
         if (!date) return "";
         return date.toISOString().split("T")[0];
     };
 
-    // Hiển thị text của option đã chọn
+    // Display text for the selected option
     const getSelectedOptionText = () => {
         switch (dateOption) {
             case "Today":
-                return "今日 (Today)";
+                return t("today");
             case "Yesterday":
-                return "昨日 (Yesterday)";
+                return t("yesterday");
             case "Last3Days":
-                return "過去3日間 (Last 3 days)";
+                return t("last3Days");
             case "Last7Days":
-                return "過去7日間 (Last 7 days)";
+                return t("last7Days");
             case "Custom":
-                return "カスタム (Custom)";
+                return t("custom");
             default:
-                return "Select Date Range";
+                return t("selectDateRange");
         }
     };
 
     return (
         <div className="w-full">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-                日付フィルター (Date Filter)
+                {t("dateFilter")}
             </label>
             <div ref={dropdownRef} className="relative">
                 <button
@@ -113,23 +115,20 @@ export default function DateRangeFilter({
                             {/* Quick option buttons */}
                             <div className="px-1">
                                 {[
-                                    { value: "Today", label: "今日 (Today)" },
+                                    { value: "Today", label: t("today") },
                                     {
                                         value: "Yesterday",
-                                        label: "昨日 (Yesterday)",
+                                        label: t("yesterday"),
                                     },
                                     {
                                         value: "Last3Days",
-                                        label: "過去3日間 (Last 3 days)",
+                                        label: t("last3Days"),
                                     },
                                     {
                                         value: "Last7Days",
-                                        label: "過去7日間 (Last 7 days)",
+                                        label: t("last7Days"),
                                     },
-                                    {
-                                        value: "Custom",
-                                        label: "カスタム期間 (Custom)",
-                                    },
+                                    { value: "Custom", label: t("custom") },
                                 ].map(option => (
                                     <button
                                         key={option.value}
@@ -158,7 +157,7 @@ export default function DateRangeFilter({
                                     <div className="space-y-3">
                                         <div>
                                             <label className="block text-xs font-medium text-gray-700">
-                                                開始日 (Start Date)
+                                                {t("startDate")}
                                             </label>
                                             <input
                                                 type="date"
@@ -181,7 +180,7 @@ export default function DateRangeFilter({
                                         </div>
                                         <div>
                                             <label className="block text-xs font-medium text-gray-700">
-                                                終了日 (End Date)
+                                                {t("endDate")}
                                             </label>
                                             <input
                                                 type="date"
@@ -207,7 +206,7 @@ export default function DateRangeFilter({
                                                 className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:text-sm"
                                                 onClick={() => setIsOpen(false)}
                                             >
-                                                適用 (Apply)
+                                                {t("apply")}
                                             </button>
                                         </div>
                                     </div>

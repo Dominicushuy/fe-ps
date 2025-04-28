@@ -27,9 +27,11 @@ import {
     MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import { Activity } from "@/types";
+import { useTranslations } from "next-intl";
 
 // Main component with React Query implementation
 export default function ActivityLogPage() {
+    const t = useTranslations();
     const {
         filters,
         paginatedData,
@@ -65,7 +67,7 @@ export default function ActivityLogPage() {
                     <div className="flex items-center justify-between mb-2">
                         <h2 className="text-xl font-semibold flex items-center">
                             <ClipboardDocumentListIcon className="h-6 w-6 mr-2" />
-                            アクティビティログ (Activity Log)
+                            {t("activityLog")}
                         </h2>
                         <div className="flex items-center space-x-2">
                             <span className="text-xs bg-primary-600 px-2 py-1 rounded-full flex items-center">
@@ -75,7 +77,7 @@ export default function ActivityLogPage() {
                             <button
                                 onClick={handleRefresh}
                                 className="p-2 bg-primary-600 rounded-full hover:bg-primary-500 transition-colors"
-                                title="Refresh data"
+                                title={t("refreshData")}
                             >
                                 <ArrowPathIcon
                                     className={`h-5 w-5 text-white ${
@@ -86,8 +88,7 @@ export default function ActivityLogPage() {
                         </div>
                     </div>
                     <p className="text-primary-100 text-sm">
-                        すべてのアップロードおよびダウンロード操作の履歴
-                        (History of all upload and download operations)
+                        {t("activityLogDescription")}
                     </p>
                 </div>
 
@@ -101,12 +102,12 @@ export default function ActivityLogPage() {
                             {showFilters ? (
                                 <>
                                     <XMarkIcon className="h-5 w-5 mr-2 text-gray-500" />
-                                    フィルターを閉じる (Hide Filters)
+                                    {t("hideFilters")}
                                 </>
                             ) : (
                                 <>
                                     <FunnelIcon className="h-5 w-5 mr-2 text-gray-500" />
-                                    フィルターを表示 (Show Filters)
+                                    {t("showFilters")}
                                 </>
                             )}
                         </button>
@@ -122,7 +123,7 @@ export default function ActivityLogPage() {
                             <div className="flex items-center">
                                 <AdjustmentsHorizontalIcon className="h-5 w-5 text-primary-600 mr-2" />
                                 <h3 className="text-base font-medium text-primary-900">
-                                    フィルター (Filters)
+                                    {t("filters")}
                                 </h3>
                             </div>
 
@@ -138,19 +139,19 @@ export default function ActivityLogPage() {
                                 }}
                             >
                                 <XMarkIcon className="h-3 w-3 mr-1" />
-                                すべてクリア (Clear All)
+                                {t("clearAll")}
                             </button>
                         </div>
 
                         {/* Add Search Bar above the filters */}
                         <div className="mb-4">
                             <label className="block text-sm font-medium text-gray-700 mb-1">
-                                検索 (Search)
+                                {t("search")}
                             </label>
                             <SearchBar
                                 searchTerm={filters.searchTerm}
                                 onSearch={handleSearchChange}
-                                placeholder="ID、ユーザー名、ファイル名などで検索... (Search by ID, username, filename, etc...)"
+                                placeholder={t("searchPlaceholder")}
                                 debounceMs={500}
                             />
                         </div>
@@ -209,7 +210,7 @@ export default function ActivityLogPage() {
                     {/* Active Filters Summary - Horizontal chips */}
                     <div className="mb-6 bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
                         <h4 className="text-sm font-medium text-gray-700 mb-2">
-                            適用フィルター (Applied Filters)
+                            {t("appliedFilters")}
                         </h4>
 
                         <div className="flex flex-wrap gap-2 items-center">
@@ -223,8 +224,10 @@ export default function ActivityLogPage() {
                 }`}
                             >
                                 <span className="mr-1">👤</span>
-                                Client:{" "}
-                                {filters.client ? filters.client.name : "All"}
+                                {t("client")}:{" "}
+                                {filters.client
+                                    ? filters.client.name
+                                    : t("all")}
                             </div>
 
                             {/* Date filter chip */}
@@ -234,9 +237,9 @@ export default function ActivityLogPage() {
                                 filters.customStartDate
                                     ? `${filters.customStartDate.toLocaleDateString()} - ${
                                           filters.customEndDate?.toLocaleDateString() ||
-                                          "Now"
+                                          t("now")
                                       }`
-                                    : filters.dateOption}
+                                    : t(filters.dateOption.toLowerCase())}
                             </div>
 
                             {/* Type filter chip */}
@@ -255,7 +258,7 @@ export default function ActivityLogPage() {
                                 ) : filters.type === "Upload" ? (
                                     <ArrowUpTrayIcon className="h-3 w-3 mr-1" />
                                 ) : null}
-                                Type: {filters.type}
+                                {t("type")}: {t(filters.type.toLowerCase())}
                             </div>
 
                             {/* Status filter chip */}
@@ -286,14 +289,14 @@ export default function ActivityLogPage() {
                                 ) : filters.status === "error" ? (
                                     <ExclamationCircleIcon className="h-3 w-3 mr-1" />
                                 ) : null}
-                                Status: {filters.status}
+                                {t("status")}: {t(filters.status)}
                             </div>
 
                             {/* Search term chip */}
                             {filters.searchTerm && (
                                 <div className="bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-xs font-medium flex items-center">
                                     <MagnifyingGlassIcon className="h-3 w-3 mr-1" />
-                                    Search: {filters.searchTerm}
+                                    {t("search")}: {filters.searchTerm}
                                 </div>
                             )}
                         </div>
@@ -306,8 +309,7 @@ export default function ActivityLogPage() {
                                 <div className="flex flex-col items-center">
                                     <ArrowPathIcon className="h-8 w-8 text-primary-600 animate-spin" />
                                     <p className="mt-2 text-sm text-gray-600">
-                                        データを読み込んでいます... (Loading
-                                        data...)
+                                        {t("loadingData")}
                                     </p>
                                 </div>
                             </div>
@@ -316,18 +318,18 @@ export default function ActivityLogPage() {
                                 <div className="flex flex-col items-center text-center max-w-md">
                                     <ExclamationCircleIcon className="h-12 w-12 text-red-500" />
                                     <p className="mt-2 text-lg font-medium text-red-800">
-                                        エラーが発生しました (An error occurred)
+                                        {t("errorOccurred")}
                                     </p>
                                     <p className="mt-1 text-sm text-gray-600">
                                         {error instanceof Error
                                             ? error.message
-                                            : "Unknown error"}
+                                            : t("unknownError")}
                                     </p>
                                     <button
                                         onClick={handleRefresh}
                                         className="mt-4 px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors"
                                     >
-                                        再試行 (Retry)
+                                        {t("retry")}
                                     </button>
                                 </div>
                             </div>
@@ -336,13 +338,10 @@ export default function ActivityLogPage() {
                                 <div className="flex flex-col items-center text-center max-w-md">
                                     <ClipboardDocumentListIcon className="h-12 w-12 text-gray-400" />
                                     <p className="mt-2 text-lg font-medium text-gray-700">
-                                        アクティビティがありません (No
-                                        activities found)
+                                        {t("noActivitiesFound")}
                                     </p>
                                     <p className="mt-1 text-sm text-gray-500">
-                                        フィルターを変更して再試行してください。
-                                        (Try changing your filters and try
-                                        again.)
+                                        {t("tryChangingFilters")}
                                     </p>
                                 </div>
                             </div>

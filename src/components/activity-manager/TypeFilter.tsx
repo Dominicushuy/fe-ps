@@ -8,6 +8,7 @@ import {
     ArrowUpTrayIcon,
 } from "@heroicons/react/24/outline";
 import { ActivityType } from "@/types/activity-types";
+import { useTranslations } from "next-intl";
 
 interface TypeFilterProps {
     selectedType: ActivityType | "All";
@@ -18,6 +19,8 @@ export default function TypeFilter({
     selectedType,
     onTypeChange,
 }: TypeFilterProps) {
+    const t = useTranslations();
+
     // Define button styles for consistency
     const getButtonStyle = (
         isActive: boolean,
@@ -50,7 +53,7 @@ export default function TypeFilter({
     return (
         <div className="w-full">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-                タイプフィルター (Type Filter)
+                {t("typeFilter")}
             </label>
             <div className="flex shadow-sm">
                 <button
@@ -62,7 +65,7 @@ export default function TypeFilter({
                     )}
                     onClick={() => onTypeChange("All")}
                 >
-                    All
+                    {t("all")}
                 </button>
                 <button
                     type="button"
@@ -74,7 +77,7 @@ export default function TypeFilter({
                     onClick={() => onTypeChange("Download")}
                 >
                     <ArrowDownTrayIcon className="h-3.5 w-3.5 mr-1 flex-shrink-0" />
-                    <span className="truncate">Download</span>
+                    <span className="truncate">{t("download")}</span>
                 </button>
                 <button
                     type="button"
@@ -86,7 +89,7 @@ export default function TypeFilter({
                     onClick={() => onTypeChange("Upload")}
                 >
                     <ArrowUpTrayIcon className="h-3.5 w-3.5 mr-1 flex-shrink-0" />
-                    <span className="truncate">Upload</span>
+                    <span className="truncate">{t("upload")}</span>
                 </button>
             </div>
         </div>
