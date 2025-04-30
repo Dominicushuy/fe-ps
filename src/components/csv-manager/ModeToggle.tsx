@@ -1,5 +1,6 @@
 import React from "react";
 import { CSVManagerMode } from "@/types";
+import { useTranslations } from "next-intl";
 import {
     ArrowUpTrayIcon,
     ArrowDownTrayIcon,
@@ -14,10 +15,12 @@ const ModeToggle: React.FC<ModeToggleProps> = ({
     currentMode,
     onModeChange,
 }) => {
+    const t = useTranslations();
+
     return (
         <div className="flex flex-col space-y-2">
             <label className="text-sm font-medium text-gray-700">
-                モード選択 (Select Mode)
+                {t("modeSelection")}
             </label>
             <div className="inline-flex rounded-md shadow-sm">
                 <button
@@ -30,7 +33,7 @@ const ModeToggle: React.FC<ModeToggleProps> = ({
                 >
                     <div className="flex items-center justify-center">
                         <ArrowUpTrayIcon className="h-5 w-5 mr-2" />
-                        <span>Upload</span>
+                        <span>{t("upload")}</span>
                     </div>
                 </button>
                 <button
@@ -43,7 +46,7 @@ const ModeToggle: React.FC<ModeToggleProps> = ({
                 >
                     <div className="flex items-center justify-center">
                         <ArrowDownTrayIcon className="h-5 w-5 mr-2" />
-                        <span>Download</span>
+                        <span>{t("download")}</span>
                     </div>
                 </button>
             </div>

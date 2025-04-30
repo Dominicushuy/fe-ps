@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslations } from "next-intl";
 import { ColumnFilter, FilterOperator } from "@/types";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
@@ -9,66 +10,72 @@ interface FilterItemProps {
     onRemoveFilter: () => void;
 }
 
+export function operatorNeedsValue(operator: FilterOperator): boolean {
+    return operator !== "ALL" && operator !== "other";
+}
+
 export default function FilterItem({
     filter,
     columns,
     onFilterChange,
     onRemoveFilter,
 }: FilterItemProps) {
+    const t = useTranslations();
+
     // Danh sách các toán tử lọc với nhãn tiếng Nhật và tiếng Anh - đã loại bỏ "ALL" và "other"
     const operators: { value: FilterOperator; label: string }[] = [
         {
             value: "CASE_CONTAIN_AND",
-            label: "(複数)テキスト: 含む AND (Text: Contains AND)",
+            label: t("operatorContainsAnd"),
         },
         {
             value: "CASE_CONTAIN_OR",
-            label: "(複数)テキスト: 含む OR (Text: Contains OR)",
+            label: t("operatorContainsOr"),
         },
         {
             value: "CASE_NOT_CONTAIN",
-            label: "(複数)テキスト: 含まない (Text: Not Contains)",
+            label: t("operatorNotContains"),
         },
         {
             value: "CASE_START_WITH",
-            label: "(複数)テキスト: 次で始まる (Text: Starts With)",
+            label: t("operatorStartsWith"),
         },
         {
             value: "CASE_END_WITH",
-            label: "(複数)テキスト: 次で終わる (Text: Ends With)",
+            label: t("operatorEndsWith"),
         },
-        { value: "CASE_EQUAL", label: "(複数)テキスト: 等しい (Text: Equals)" },
+        { value: "CASE_EQUAL", label: t("operatorEquals") },
         {
             value: "CASE_NOT_EQUAL",
-            label: "(複数)テキスト: 等しくない (Text: Not Equals)",
+            label: t("operatorNotEquals"),
         },
         {
             value: "CONTAIN_AND",
-            label: "(複数)テキスト: 含む(小文字) AND (Text: Contains AND - Lowercase)",
+            label: t("operatorContainsAndLowercase"),
         },
         {
             value: "CONTAIN_OR",
-            label: "(複数)テキスト: 含む(小文字) OR (Text: Contains OR - Lowercase)",
+            label: t("operatorContainsOrLowercase"),
         },
         {
             value: "NOT_CONTAIN",
-            label: "(複数)テキスト: 含まない(小文字) (Text: Not Contains - Lowercase)",
+            label: t("operatorNotContainsLowercase"),
         },
         {
             value: "START_WITH",
-            label: "(複数)テキスト: 次で始まる(小文字) (Text: Starts With - Lowercase)",
+            label: t("operatorStartsWithLowercase"),
         },
         {
             value: "END_WITH",
-            label: "(複数)テキスト: 次で終わる(小文字) (Text: Ends With - Lowercase)",
+            label: t("operatorEndsWithLowercase"),
         },
         {
             value: "EQUAL",
-            label: "(複数)テキスト: 等しい(小文字) (Text: Equals - Lowercase)",
+            label: t("operatorEqualsLowercase"),
         },
         {
             value: "NOT_EQUAL",
-            label: "(複数)テキスト: 等しくない(小文字) (Text: Not Equals - Lowercase)",
+            label: t("operatorNotEqualsLowercase"),
         },
     ];
 
@@ -101,7 +108,7 @@ export default function FilterItem({
             {/* Chọn cột */}
             <div className="w-full sm:w-1/4">
                 <label className="block text-xs font-medium text-gray-500 mb-1">
-                    カラム (Column)
+                    {t("column")}
                 </label>
                 <select
                     value={filter.columnName}
@@ -119,7 +126,7 @@ export default function FilterItem({
             {/* Chọn toán tử */}
             <div className="w-full sm:w-2/5">
                 <label className="block text-xs font-medium text-gray-500 mb-1">
-                    演算子 (Operator)
+                    {t("operator")}
                 </label>
                 <select
                     value={filter.operator}
@@ -137,18 +144,17 @@ export default function FilterItem({
             {/* Nhập giá trị (luôn hiển thị vì đã bỏ các toán tử không cần value) */}
             <div className="w-full sm:w-1/4">
                 <label className="block text-xs font-medium text-gray-500 mb-1">
-                    値 (Value)
+                    {t("value")}
                 </label>
                 <textarea
                     value={filter.value}
                     onChange={handleValueChange}
-                    placeholder="値を入力... (1行ごとに1つの値)"
+                    placeholder={t("enterValuePerLine")}
                     className="block w-full min-h-10 py-2 px-3 rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring focus:ring-primary-200 focus:ring-opacity-50 sm:text-sm transition-all resize-y"
                     rows={3}
                 />
                 <p className="mt-1 text-xs text-gray-400">
-                    各行は別々の値として処理されます (Each line is treated as a
-                    separate value)
+                    {t("eachLineTreatedAsValue")}
                 </p>
             </div>
 
@@ -158,7 +164,7 @@ export default function FilterItem({
                     type="button"
                     onClick={onRemoveFilter}
                     className="inline-flex items-center justify-center rounded-md border border-gray-300 bg-white h-10 w-10 text-gray-400 hover:bg-red-50 hover:text-red-500 hover:border-red-300 transition-colors"
-                    title="削除 (Remove)"
+                    title={t("remove")}
                 >
                     <XMarkIcon className="h-4 w-4" />
                 </button>

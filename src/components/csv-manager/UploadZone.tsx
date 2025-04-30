@@ -2,6 +2,7 @@
 
 import React, { useState, useCallback, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
+import { useTranslations } from "next-intl";
 import {
     DocumentArrowUpIcon,
     CheckCircleIcon,
@@ -31,6 +32,7 @@ export default function UploadZone({
     onFileSelect,
     disabled = false,
 }: UploadZoneProps) {
+    const t = useTranslations();
     const [file, setFile] = useState<File | null>(null);
     const [uploadStatus, setUploadStatus] = useState<UploadStatus>(
         UploadStatus.IDLE,
@@ -50,16 +52,14 @@ export default function UploadZone({
 
             // Kiểm tra định dạng file
             if (!selectedFile.name.endsWith(".csv")) {
-                setErrorMessage(
-                    "CSVファイルのみアップロードできます。(Only CSV files are allowed.)",
-                );
+                setErrorMessage("CSVファイルのみアップロードできます。");
                 return;
             }
 
             // Kiểm tra kích thước file
             if (selectedFile.size > MAX_FILE_SIZE) {
                 setErrorMessage(
-                    "ファイルサイズは100MBを超えることはできません。(File size cannot exceed 100MB.)",
+                    "ファイルサイズは100MBを超えることはできません。",
                 );
                 return;
             }
@@ -165,7 +165,7 @@ export default function UploadZone({
                         onClick={() => setErrorMessage("")}
                         className="mt-4 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 focus:outline-none transition-colors"
                     >
-                        再試行 (Try Again)
+                        {t("retry")}
                     </button>
                 </div>
             );
@@ -176,7 +176,7 @@ export default function UploadZone({
                 <div className="flex flex-col items-center">
                     <CheckCircleIcon className="w-12 h-12 text-green-500 mb-4" />
                     <p className="text-sm text-green-600 font-medium">
-                        アップロード成功! (Upload successful!)
+                        {t("uploadValidationSuccess")}
                     </p>
                     <div className="mt-4 flex items-center bg-white rounded-md p-2 border border-gray-200 max-w-full">
                         <DocumentTextIcon className="w-5 h-5 text-gray-500 mr-2 flex-shrink-0" />
@@ -194,11 +194,10 @@ export default function UploadZone({
                             className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md shadow-sm transition-colors flex items-center"
                         >
                             <TrashIcon className="h-4 w-4 mr-1.5" />
-                            ファイルを削除 (Clear file)
+                            {t("clearFile")}
                         </button>
                         <p className="text-xs text-gray-500">
-                            または新しいファイルを選択して置き換える (or select
-                            a new file to replace)
+                            {t("orSelectNewFile")}
                         </p>
                     </div>
                 </div>
@@ -210,15 +209,10 @@ export default function UploadZone({
             <div className="flex flex-col items-center">
                 <DocumentArrowUpIcon className="w-12 h-12 text-primary-400 mb-4" />
                 <p className="text-sm text-gray-500 font-medium">
-                    ここにCSVファイルをドラッグ＆ドロップするか
-                </p>
-                <p className="text-sm text-gray-500">
-                    ファイルを選択してください。(Drag & drop a CSV file here or
-                    click to select)
+                    {t("dropCsvFileHere")}
                 </p>
                 <p className="text-xs text-gray-400 mt-2">
-                    最大サイズ: 100MB、形式: .csv のみ (Max size: 100MB, Format:
-                    .csv only)
+                    {t("maxSizeAndFormat")}
                 </p>
             </div>
         );
@@ -227,7 +221,7 @@ export default function UploadZone({
     return (
         <div className="w-full">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-                CSVファイルをアップロード (Upload CSV File)
+                {t("uploadCsvFile")}
             </label>
 
             <div {...getRootProps()} className={dropzoneClassName}>
@@ -241,29 +235,24 @@ export default function UploadZone({
                     <CheckCircleIcon className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
                     <div className="flex-1">
                         <p className="text-sm font-medium text-green-700">
-                            ファイルが正常にアップロードされました (File
-                            successfully uploaded)
+                            {t("fileUploadedSuccessfully")}
                         </p>
                         <p className="text-xs text-green-600 mt-1">
-                            ファイル名:{" "}
+                            {t("fileName")}:{" "}
                             <span className="font-medium">{file.name}</span> |
-                            サイズ:{" "}
+                            {t("size")}:{" "}
                             <span className="font-medium">
                                 {formatFileSize(file.size)}
                             </span>
                         </p>
                         <p className="text-xs text-green-600 mt-3">
-                            新しいファイルをアップロードするには、上記のアップロードゾーンをクリックするか、ファイルをドラッグ＆ドロップしてください。
-                        </p>
-                        <p className="text-xs text-green-600">
-                            (To upload a new file, click on the upload zone
-                            above or drag and drop a file.)
+                            {t("toUploadNewFile")}
                         </p>
                     </div>
                     <button
                         onClick={handleClearFile}
                         className="ml-2 p-1.5 bg-red-100 hover:bg-red-200 text-red-600 rounded flex-shrink-0 transition-colors"
-                        title="ファイルを削除 (Clear file)"
+                        title={t("clearFile")}
                     >
                         <TrashIcon className="h-5 w-5" />
                     </button>

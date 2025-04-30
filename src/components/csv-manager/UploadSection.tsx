@@ -1,6 +1,7 @@
 // src/components/csv-manager/UploadSection.tsx
 
 import React, { useCallback } from "react";
+import { useTranslations } from "next-intl";
 import UploadZone from "./UploadZone";
 import CSVPreview from "./CSVPreview";
 import { Client } from "@/types";
@@ -25,6 +26,8 @@ const UploadSection: React.FC<UploadSectionProps> = ({
     onValidationComplete,
     onSubmit,
 }) => {
+    const t = useTranslations();
+
     // Handle upload completion - clear file
     const handleUploadComplete = useCallback(() => {
         // This will be called after a successful upload
@@ -43,8 +46,7 @@ const UploadSection: React.FC<UploadSectionProps> = ({
             {/* Display message if no client is selected */}
             {!selectedClient && (
                 <p className="mt-2 text-sm text-amber-600">
-                    ファイルをアップロードする前にクライアントを選択してください。
-                    (Please select a client before uploading files.)
+                    {t("selectClientBeforeUpload")}
                 </p>
             )}
 

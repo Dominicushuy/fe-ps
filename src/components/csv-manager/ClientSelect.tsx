@@ -5,6 +5,7 @@ import { useDebounce } from "use-debounce";
 import { Client } from "@/types";
 import { UserCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useClients } from "@/hooks/useClients";
+import { useTranslations } from "next-intl";
 
 interface ClientSelectProps {
     selectedClient: Client | null;
@@ -24,6 +25,7 @@ export default function ClientSelect({
     onClientSelect,
     disabled = false,
 }: ClientSelectProps) {
+    const t = useTranslations();
     // State to store input search value
     const [inputValue, setInputValue] = useState("");
     // Debounce search (500ms)
@@ -56,7 +58,7 @@ export default function ClientSelect({
     return (
         <div className="w-full max-w-md">
             <label className="block text-sm font-medium text-gray-700 mb-1">
-                選択クライアント (Select Client)
+                {t("selectClient")}
             </label>
             <div className="relative">
                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 z-10 pointer-events-none">
@@ -77,11 +79,9 @@ export default function ClientSelect({
                     isDisabled={disabled}
                     isLoading={isLoading}
                     isClearable
-                    placeholder="アカウントIDで検索 (Search by Account ID)"
-                    loadingMessage={() => "ロード中... (Loading...)"}
-                    noOptionsMessage={() =>
-                        "検索結果がありません (No results found)"
-                    }
+                    placeholder={t("searchByAccountId")}
+                    loadingMessage={() => t("loading")}
+                    noOptionsMessage={() => t("noResultsFound")}
                     // Control input value
                     // inputValue={inputValue}
                     onInputChange={(newValue, actionMeta) => {
@@ -133,14 +133,14 @@ export default function ClientSelect({
                         className="absolute top-2 right-2 p-1 rounded-full clear-button hover:bg-gray-200 transition-colors"
                         onClick={() => onClientSelect(null)}
                         disabled={disabled}
-                        title="Clear selection"
-                        aria-label="Clear selection"
+                        title={t("clearSearch")}
+                        aria-label={t("clearSearch")}
                     >
                         <XMarkIcon className="h-4 w-4 text-gray-500 hover:text-gray-700" />
                     </button>
 
                     <p className="text-sm font-medium text-gray-700">
-                        選択されたクライアント (Selected Client):
+                        {t("selectedClient")}:
                     </p>
                     <div className="mt-1 flex items-center">
                         <UserCircleIcon className="h-5 w-5 text-primary-600 mr-2" />

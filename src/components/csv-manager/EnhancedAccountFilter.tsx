@@ -1,6 +1,7 @@
 // src/components/csv-manager/EnhancedAccountFilter.tsx
 
 import React, { useState, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import {
     MagnifyingGlassIcon,
     XMarkIcon,
@@ -24,6 +25,7 @@ export default function EnhancedAccountFilter({
     selectedAccounts,
     onAccountChange,
 }: EnhancedAccountFilterProps) {
+    const t = useTranslations();
     const [availableSearchTerm, setAvailableSearchTerm] = useState("");
     const [selectedSearchTerm, setSelectedSearchTerm] = useState("");
 
@@ -101,8 +103,10 @@ export default function EnhancedAccountFilter({
         <div className="w-full">
             {/* Selection stats */}
             <div className="mb-2 text-xs text-gray-600">
-                {selectedAccounts.length} / {allAccounts.length}{" "}
-                アカウントが選択されました
+                {t("totalRecordsSelected", {
+                    "0": selectedAccounts.length.toString(),
+                    "1": allAccounts.length.toString(),
+                })}
             </div>
 
             {/* Selection interface with two cards */}
@@ -111,7 +115,7 @@ export default function EnhancedAccountFilter({
                 <div className="flex-1 border border-gray-200 rounded-lg shadow-sm">
                     <div className="bg-gray-50 p-2 border-b border-gray-200 rounded-t-lg">
                         <h3 className="text-sm font-medium text-gray-700">
-                            利用可能なアカウント (Available Accounts)
+                            {t("availableAccounts")}
                         </h3>
 
                         {/* Search input for available accounts */}
@@ -119,7 +123,7 @@ export default function EnhancedAccountFilter({
                             <input
                                 type="text"
                                 className="block w-full pr-10 pl-10 py-2 text-sm border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                                placeholder="アカウント/メディアを検索... (Search accounts/media...)"
+                                placeholder={t("searchAccounts")}
                                 value={availableSearchTerm}
                                 onChange={e =>
                                     setAvailableSearchTerm(e.target.value)
@@ -143,14 +147,16 @@ export default function EnhancedAccountFilter({
                         {availableAccounts.length > 0 && (
                             <div className="mt-2 flex justify-between">
                                 <span className="text-xs text-gray-500">
-                                    {availableAccounts.length} アカウント表示中
+                                    {t("accountsDisplayed", {
+                                        "0": availableAccounts.length.toString(),
+                                    })}
                                 </span>
                                 <button
                                     type="button"
                                     className="text-xs text-primary-600 hover:text-primary-800"
                                     onClick={selectAllFiltered}
                                 >
-                                    すべて選択 (Select All)
+                                    {t("selectAll")}
                                 </button>
                             </div>
                         )}
@@ -181,16 +187,16 @@ export default function EnhancedAccountFilter({
                                     ></path>
                                 </svg>
                                 <p className="mt-2 text-sm text-gray-500">
-                                    ロード中... (Loading...)
+                                    {t("loading")}
                                 </p>
                             </div>
                         ) : availableAccounts.length === 0 ? (
                             <div className="py-2 px-3 text-sm text-gray-500 italic text-center">
                                 {availableSearchTerm
-                                    ? "検索結果はありません (No search results)"
+                                    ? t("noResultsFound")
                                     : clientId
-                                    ? "利用可能なアカウントはありません (No available accounts)"
-                                    : "クライアントを選択してください (Please select a client)"}
+                                    ? t("noAvailableAccounts")
+                                    : t("pleaseSelectClient")}
                             </div>
                         ) : (
                             <ul className="divide-y divide-gray-200">
@@ -248,7 +254,7 @@ export default function EnhancedAccountFilter({
                                                     selectAccount(account);
                                                 }}
                                                 className="ml-2 flex-shrink-0 p-1 rounded-full text-primary-600 hover:bg-primary-100 group-hover:bg-primary-100 group-hover:text-primary-700"
-                                                title="選択 (Select)"
+                                                title={t("select")}
                                             >
                                                 <ArrowRightIcon className="h-5 w-5" />
                                             </button>
@@ -264,7 +270,7 @@ export default function EnhancedAccountFilter({
                 <div className="flex-1 border border-gray-200 rounded-lg shadow-sm">
                     <div className="bg-primary-50 p-2 border-b border-primary-200 rounded-t-lg">
                         <h3 className="text-sm font-medium text-primary-700">
-                            選択されたアカウント (Selected Accounts)
+                            {t("selectedAccounts")}
                         </h3>
 
                         {/* Search input for selected accounts */}
@@ -272,7 +278,7 @@ export default function EnhancedAccountFilter({
                             <input
                                 type="text"
                                 className="block w-full pr-10 pl-10 py-2 text-sm border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500"
-                                placeholder="選択されたアカウントを検索... (Search selected...)"
+                                placeholder={t("searchSelected")}
                                 value={selectedSearchTerm}
                                 onChange={e =>
                                     setSelectedSearchTerm(e.target.value)
@@ -296,15 +302,16 @@ export default function EnhancedAccountFilter({
                         {filteredSelectedAccounts.length > 0 && (
                             <div className="mt-2 flex justify-between">
                                 <span className="text-xs text-gray-500">
-                                    {filteredSelectedAccounts.length}{" "}
-                                    アカウント選択済み
+                                    {t("accountsSelected", {
+                                        "0": filteredSelectedAccounts.length.toString(),
+                                    })}
                                 </span>
                                 <button
                                     type="button"
                                     className="text-xs text-red-600 hover:text-red-800"
                                     onClick={deselectAllFiltered}
                                 >
-                                    すべて削除 (Remove All)
+                                    {t("removeAll")}
                                 </button>
                             </div>
                         )}
@@ -315,8 +322,8 @@ export default function EnhancedAccountFilter({
                         {filteredSelectedAccounts.length === 0 ? (
                             <div className="py-2 px-3 text-sm text-gray-500 italic text-center">
                                 {selectedSearchTerm
-                                    ? "検索結果はありません (No search results)"
-                                    : "アカウントが選択されていません (No accounts selected)"}
+                                    ? t("noResultsFound")
+                                    : t("noAccountsSelected")}
                             </div>
                         ) : (
                             <ul className="divide-y divide-gray-200">
@@ -337,7 +344,7 @@ export default function EnhancedAccountFilter({
                                                     deselectAccount(account);
                                                 }}
                                                 className="mr-2 flex-shrink-0 p-1 rounded-full text-red-600 hover:bg-red-100 group-hover:bg-red-100 group-hover:text-red-700"
-                                                title="削除 (Remove)"
+                                                title={t("remove")}
                                             >
                                                 <ArrowLeftIcon className="h-5 w-5" />
                                             </button>

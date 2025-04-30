@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { MagnifyingGlassIcon, XCircleIcon } from "@heroicons/react/24/outline";
 
 interface SearchBarProps {
@@ -13,12 +14,17 @@ interface SearchBarProps {
 export default function SearchBar({
     searchTerm,
     onSearch,
-    placeholder = "検索... (Search...)",
+    placeholder,
     debounceMs = 300,
 }: SearchBarProps) {
+    const t = useTranslations();
     const [localSearchTerm, setLocalSearchTerm] = useState(searchTerm);
     const searchInputRef = useRef<HTMLInputElement>(null);
     const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Use translation for placeholder if not provided
+    const defaultPlaceholder = t("searchPlaceholder");
+    const finalPlaceholder = placeholder || defaultPlaceholder;
 
     // Sync với external state
     useEffect(() => {
@@ -100,7 +106,7 @@ export default function SearchBar({
                     focus:border-blue-500   
                     text-sm  
                 "
-                placeholder={placeholder}
+                placeholder={finalPlaceholder}
                 aria-label="Search through all columns"
             />
 
@@ -114,7 +120,7 @@ export default function SearchBar({
                             hover:text-gray-600   
                             focus:outline-none  
                         "
-                        aria-label="Clear search"
+                        aria-label={t("clearSearch")}
                     >
                         <XCircleIcon className="h-5 w-5" aria-hidden="true" />
                     </button>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/24/solid";
 import { CSVRow, ColumnFilter } from "@/types";
 import { applyFilters } from "@/lib/utils/filter-utils";
@@ -22,6 +23,7 @@ export default function DataTable({
     searchTerm,
     isDownloadMode = false,
 }: DataTableProps) {
+    const t = useTranslations();
     const [sortConfig, setSortConfig] = useState<{
         key: string | null;
         direction: "ascending" | "descending";
@@ -71,9 +73,7 @@ export default function DataTable({
     if (data.length === 0) {
         return (
             <div className="text-center py-10 border rounded-lg">
-                <p className="text-gray-500">
-                    データがありません (No data available)
-                </p>
+                <p className="text-gray-500">{t("noDataAvailable")}</p>
             </div>
         );
     }
@@ -87,14 +87,10 @@ export default function DataTable({
     if (filteredData.length === 0) {
         return (
             <div className="text-center py-10 border rounded-lg">
-                <p className="text-gray-500">
-                    検索条件に一致するデータがありません (No data matching the
-                    filter criteria)
-                </p>
+                <p className="text-gray-500">{t("noDataMatchingFilter")}</p>
                 {(filters.length > 0 || searchTerm) && (
                     <p className="text-sm text-gray-400 mt-2">
-                        検索条件またはフィルターを変更してみてください (Try
-                        changing your search term or filters)
+                        {t("tryChangingSearchTerm")}
                     </p>
                 )}
             </div>
@@ -153,7 +149,7 @@ export default function DataTable({
                                         >
                                             {row[column] || (
                                                 <span className="text-gray-300 italic">
-                                                    Empty
+                                                    {t("emptyCell")}
                                                 </span>
                                             )}
                                         </td>
@@ -167,11 +163,11 @@ export default function DataTable({
 
             {/* Hiển thị thông tin số lượng bản ghi */}
             <div className="mt-2 text-sm text-gray-600">
-                合計{" "}
+                {t("showing")}{" "}
                 <span className="font-medium text-primary-800">
                     {filteredData.length}
                 </span>{" "}
-                レコード中
+                {t("recordsTotal")}
                 <span className="font-medium text-primary-800">
                     {" "}
                     {Math.min(
@@ -179,16 +175,16 @@ export default function DataTable({
                         filteredData.length,
                     )}
                 </span>{" "}
-                から
+                {t("to")}
                 <span className="font-medium text-primary-800">
                     {" "}
                     {Math.min(currentPage * itemsPerPage, filteredData.length)}
                 </span>{" "}
-                まで表示
+                {t("displayed")}
                 {filteredData.length !== data.length && (
                     <span className="text-gray-500">
                         {" "}
-                        (フィルター適用済み: 元の {data.length} レコードから)
+                        ({t("filteredFrom")} {data.length} {t("records")})
                     </span>
                 )}
             </div>

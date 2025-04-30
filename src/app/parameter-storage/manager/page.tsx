@@ -3,6 +3,7 @@
 "use client";
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import ModeToggle from "@/components/csv-manager/ModeToggle";
 import ClientSelect from "@/components/csv-manager/ClientSelect";
 import ConfirmClientChangeDialog from "@/components/csv-manager/ConfirmClientChangeDialog";
@@ -13,6 +14,8 @@ import UploadSection from "@/components/csv-manager/UploadSection";
 import DownloadSection from "@/components/csv-manager/DownloadSection";
 
 export default function CSVManagerPage() {
+    const t = useTranslations();
+
     const {
         mode,
         selectedClient,
@@ -63,7 +66,7 @@ export default function CSVManagerPage() {
 
             <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
                 <h2 className="text-xl font-semibold mb-6 text-primary-900 border-b border-primary-100 pb-3">
-                    Parame Storage Manager
+                    {t("parameStorageManager")}
                 </h2>
 
                 {/* Mode Selector */}

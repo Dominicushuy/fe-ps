@@ -2,6 +2,7 @@ import React, { Fragment } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { Client } from "@/types";
+import { useTranslations } from "next-intl";
 
 interface ConfirmClientChangeDialogProps {
     isOpen: boolean;
@@ -18,6 +19,8 @@ export default function ConfirmClientChangeDialog({
     currentClient,
     newClient,
 }: ConfirmClientChangeDialogProps) {
+    const t = useTranslations();
+
     return (
         <Transition.Root show={isOpen} as={Fragment}>
             <Dialog as="div" className="relative z-10" onClose={onClose}>
@@ -57,42 +60,34 @@ export default function ConfirmClientChangeDialog({
                                             as="h3"
                                             className="text-base font-semibold leading-6 text-gray-900"
                                         >
-                                            クライアント変更の確認 (Client
-                                            Change Confirmation)
+                                            {t("clientChangeConfirmation")}
                                         </Dialog.Title>
                                         <div className="mt-2">
                                             <p className="text-sm text-gray-500">
-                                                現在のCSVデータはアップロードされたファイルから生成されています。クライアントを変更すると、現在のファイルとデータプレビューがクリアされます。
-                                            </p>
-                                            <p className="text-sm text-gray-500 mt-2">
-                                                (Current CSV data is generated
-                                                from the uploaded file. Changing
-                                                the client will clear the
-                                                current file and data preview.)
+                                                {t("clientChangeWarningDetail")}
                                             </p>
 
                                             <div className="mt-4 bg-gray-50 p-3 rounded-md border border-gray-200">
                                                 <div className="flex flex-col gap-2">
                                                     <div>
                                                         <p className="text-xs text-gray-500">
-                                                            現在のクライアント
-                                                            (Current Client):
+                                                            {t("currentClient")}
+                                                            :
                                                         </p>
                                                         <p className="text-sm font-medium text-gray-700">
                                                             {currentClient
                                                                 ? `${currentClient.accountId} - ${currentClient.name}`
-                                                                : "なし (None)"}
+                                                                : t("none")}
                                                         </p>
                                                     </div>
                                                     <div className="border-t border-gray-200 pt-2">
                                                         <p className="text-xs text-gray-500">
-                                                            新しいクライアント
-                                                            (New Client):
+                                                            {t("newClient")}:
                                                         </p>
                                                         <p className="text-sm font-medium text-primary-700">
                                                             {newClient
                                                                 ? `${newClient.accountId} - ${newClient.name}`
-                                                                : "なし (None)"}
+                                                                : t("none")}
                                                         </p>
                                                     </div>
                                                 </div>
@@ -106,14 +101,14 @@ export default function ConfirmClientChangeDialog({
                                         className="inline-flex w-full justify-center rounded-md bg-primary-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary-500 sm:ml-3 sm:w-auto"
                                         onClick={onConfirm}
                                     >
-                                        変更する (Change)
+                                        {t("change")}
                                     </button>
                                     <button
                                         type="button"
                                         className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
                                         onClick={onClose}
                                     >
-                                        キャンセル (Cancel)
+                                        {t("cancelAction")}
                                     </button>
                                 </div>
                             </Dialog.Panel>

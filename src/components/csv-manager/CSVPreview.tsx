@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useTranslations } from "next-intl";
 import { Client, CSVRow, ValidationError } from "@/types";
 import { Switch } from "@headlessui/react";
 import {
@@ -26,6 +27,7 @@ export default function CSVPreview({
     isSubmitting = false,
     onSubmit,
 }: CSVPreviewProps) {
+    const t = useTranslations();
     const [isValidating, setIsValidating] = useState(false);
     const [previewData, setPreviewData] = useState<CSVRow[]>([]);
     const [errors, setErrors] = useState<ValidationError[]>([]);
@@ -93,8 +95,7 @@ export default function CSVPreview({
                         validationErrors.push({
                             rowIndex: -1,
                             columnName: missingColumns.join(", "),
-                            message:
-                                "必須列が見つかりません (Missing required columns)",
+                            message: t("missingRequiredColumns"),
                         });
                     }
 
@@ -108,8 +109,7 @@ export default function CSVPreview({
                                 validationErrors.push({
                                     rowIndex,
                                     columnName: col,
-                                    message:
-                                        "空のセルは許可されていません (Empty cell is not allowed)",
+                                    message: t("emptyCellNotAllowed"),
                                     value: row[col],
                                 });
                             }
@@ -133,7 +133,9 @@ export default function CSVPreview({
                                     validationErrors.push({
                                         rowIndex,
                                         columnName: "CID",
-                                        message: `CIDはクライアントIDと一致しません。期待される値: ${selectedClient.id}-xxx-xxx (CID does not match client ID. Expected: ${selectedClient.id}-xxx-xxx)`,
+                                        message: t("cidDoesNotMatchClientId", {
+                                            clientId: selectedClient.id,
+                                        }),
                                         value: cidValue,
                                     });
                                 }
@@ -141,7 +143,9 @@ export default function CSVPreview({
                                 validationErrors.push({
                                     rowIndex,
                                     columnName: "CID",
-                                    message: `CID形式が正しくありません。期待される形式: ${selectedClient.id}-XXX-XXX (Invalid CID format. Expected format: ${selectedClient.id}-XXX-XXX)`,
+                                    message: t("invalidCidFormat", {
+                                        clientId: selectedClient.id,
+                                    }),
                                     value: cidValue,
                                 });
                             }
@@ -166,8 +170,7 @@ export default function CSVPreview({
                         {
                             rowIndex: -1,
                             columnName: "",
-                            message:
-                                "CSVファイルの解析中にエラーが発生しました (Error parsing CSV file)",
+                            message: t("errorParsingCsvFile"),
                         },
                     ]);
                     setIsValid(false);
@@ -178,7 +181,7 @@ export default function CSVPreview({
         };
 
         validateCSV();
-    }, [file, selectedClient, onValidationComplete]);
+    }, [file, selectedClient, onValidationComplete, t]);
 
     // Xử lý việc submit với xác nhận ghi đè
     const handleSubmit = useCallback(() => {
@@ -195,7 +198,7 @@ export default function CSVPreview({
                 <div className="flex flex-col items-center">
                     <ArrowPathIcon className="w-10 h-10 text-blue-500 animate-spin mb-4" />
                     <p className="text-blue-600 font-medium">
-                        CSVファイルを検証中... (Validating CSV file...)
+                        {t("validatingCsvFile")}
                     </p>
                 </div>
             </div>
@@ -218,14 +221,10 @@ export default function CSVPreview({
                     <XCircleIcon className="w-6 h-6 text-red-500 mr-3 flex-shrink-0" />
                     <div>
                         <h3 className="text-red-800 font-medium text-lg">
-                            CSVフォーマットエラー (CSV Format Error)
+                            {t("csvFormatError")}
                         </h3>
                         <div className="mt-2 text-red-700">
-                            <p>
-                                次の必須列がCSVファイルに見つかりません (The
-                                following required columns are missing in the
-                                CSV file):
-                            </p>
+                            <p>{t("missingRequiredColumnsInFile")}:</p>
                             <ul className="list-disc list-inside mt-1 space-y-1">
                                 {errors
                                     .filter(err => err.rowIndex === -1)
@@ -236,16 +235,13 @@ export default function CSVPreview({
                                     ))}
                             </ul>
                             <p className="mt-4">
-                                CSVファイルには次の列が必要です (Your CSV file
-                                must include these columns):
+                                {t("csvFileMustIncludeColumns")}:
                             </p>
                             <p className="mt-1 font-mono text-sm bg-red-100 p-2 rounded">
                                 {requiredColumns.join(", ")}
                             </p>
                             <p className="mt-4">
-                                正しい形式のCSVファイルをアップロードしてください。
-                                (Please upload a CSV file with the correct
-                                format.)
+                                {t("pleaseUploadCorrectFormatCsv")}
                             </p>
                         </div>
                     </div>
@@ -273,19 +269,17 @@ export default function CSVPreview({
                     <div>
                         {isValid ? (
                             <h3 className="text-green-800 font-medium">
-                                検証成功! CSVファイルは有効です。 (Validation
-                                successful! CSV file is valid.)
+                                {t("uploadValidationSuccess")}
                             </h3>
                         ) : (
                             <>
                                 <h3 className="text-yellow-800 font-medium">
-                                    検証警告: {errors.length}
-                                    個のエラーが見つかりました。 (Validation
-                                    warning: {errors.length} errors found.)
+                                    {t("uploadValidationWarning", {
+                                        "0": errors.length.toString(),
+                                    })}
                                 </h3>
                                 <p className="text-yellow-700 mt-2">
-                                    続行する前にすべてのエラーを修正してください。
-                                    (Please fix all errors before proceeding.)
+                                    {t("fixAllErrorsBeforeProceeding")}
                                 </p>
                             </>
                         )}
@@ -294,7 +288,7 @@ export default function CSVPreview({
             </div>
 
             <h3 className="text-lg font-medium text-gray-800 mb-3">
-                CSVプレビュー (CSV Preview)
+                {t("csvPreview")}
             </h3>
 
             <div className="overflow-x-auto rounded-lg border border-gray-200">
@@ -356,7 +350,7 @@ export default function CSVPreview({
                                         >
                                             {row[header] || (
                                                 <span className="text-red-500 italic">
-                                                    Empty
+                                                    {t("emptyCell")}
                                                 </span>
                                             )}
                                             {cellError && (
@@ -376,9 +370,10 @@ export default function CSVPreview({
             {/* Show preview indication if data has more than 5 rows */}
             {previewData.length > 5 && (
                 <p className="text-sm text-gray-500 mt-2">
-                    プレビューは最初の5行のみを表示しています。全部で{" "}
-                    {previewData.length} 行あります。 (Preview shows only first
-                    5 rows. Total: {previewData.length} rows.)
+                    {t("previewShowsFirstRows", {
+                        "0": "5",
+                        "1": previewData.length.toString(),
+                    })}
                 </p>
             )}
 
@@ -386,7 +381,7 @@ export default function CSVPreview({
             {!isValid && (
                 <div className="mt-6 p-4 bg-red-50 rounded-lg border border-red-200">
                     <h3 className="text-red-800 font-medium">
-                        エラー概要 (Error Summary)
+                        {t("errorSummary")}
                     </h3>
 
                     {/* Client CID validation message */}
@@ -397,24 +392,17 @@ export default function CSVPreview({
                                     <ExclamationCircleIcon className="h-5 w-5 text-red-600 mr-2 flex-shrink-0 mt-0.5" />
                                     <div>
                                         <p className="text-sm font-medium text-red-800">
-                                            クライアントIDとCIDの不一致 (Client
-                                            ID and CID mismatch)
+                                            {t("clientIdAndCidMismatch")}
                                         </p>
                                         <p className="text-xs text-red-700 mt-1">
-                                            選択されたクライアント:{" "}
+                                            {t("selectedClient")}:{" "}
                                             {selectedClient.name} (ID:{" "}
                                             {selectedClient.id})
                                         </p>
                                         <p className="text-xs text-red-700 mt-1">
-                                            CSVファイル内のCIDは、このクライアントのIDと一致する必要があります。CIDの最初の部分が「
-                                            {selectedClient.id}
-                                            」で始まる必要があります。
-                                        </p>
-                                        <p className="text-xs text-red-700 mt-1">
-                                            (CIDs in the CSV file must match
-                                            this client&apos;s ID. The first
-                                            part of CID should start with &quot;
-                                            {selectedClient.id}&quot;)
+                                            {t("cidMustMatchClientId", {
+                                                clientId: selectedClient.id,
+                                            })}
                                         </p>
                                     </div>
                                 </div>
@@ -429,19 +417,19 @@ export default function CSVPreview({
                                         scope="col"
                                         className="px-4 py-2 text-left text-xs font-medium text-red-700"
                                     >
-                                        行 (Row)
+                                        {t("row")}
                                     </th>
                                     <th
                                         scope="col"
                                         className="px-4 py-2 text-left text-xs font-medium text-red-700"
                                     >
-                                        列 (Column)
+                                        {t("column")}
                                     </th>
                                     <th
                                         scope="col"
                                         className="px-4 py-2 text-left text-xs font-medium text-red-700"
                                     >
-                                        エラー (Error)
+                                        {t("error")}
                                     </th>
                                 </tr>
                             </thead>
@@ -484,8 +472,7 @@ export default function CSVPreview({
                             <div className="flex-grow">
                                 <div className="flex justify-between items-center">
                                     <h4 className="text-amber-800 font-medium">
-                                        パラメ重複チェック (Parame duplicated
-                                        check)
+                                        {t("parameDuplicatedCheck")}
                                     </h4>
                                     <Switch
                                         checked={confirmOverwrite}
@@ -497,8 +484,7 @@ export default function CSVPreview({
                                         } relative inline-flex h-6 w-12 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500`}
                                     >
                                         <span className="sr-only">
-                                            パラメ重複チェック確認 (Parame
-                                            duplicated check)
+                                            {t("parameDuplicatedCheck")}
                                         </span>
                                         <span
                                             className={`${
@@ -510,16 +496,13 @@ export default function CSVPreview({
                                     </Switch>
                                 </div>
                                 <p className="text-sm text-amber-700 mt-2">
-                                    パラメータの重複をチェックします。同じパラメータが存在する場合は警告します。
-                                    (Check for duplicate parameters. Will warn
-                                    if the same parameter already exists.)
+                                    {t("checkForDuplicateParameters")}
                                 </p>
                                 {confirmOverwrite && (
                                     <div className="mt-3 p-2 bg-amber-100 rounded border border-amber-300">
                                         <p className="text-sm text-amber-800 font-medium flex items-center">
                                             <CheckCircleIcon className="h-4 w-4 mr-1 text-amber-600" />
-                                            重複チェック確認済み (Duplication
-                                            check confirmed)
+                                            {t("duplicationCheckConfirmed")}
                                         </p>
                                     </div>
                                 )}
@@ -544,10 +527,10 @@ export default function CSVPreview({
                         {isSubmitting ? (
                             <>
                                 <ArrowPathIcon className="w-5 h-5 mr-2 animate-spin" />
-                                処理中... (Processing...)
+                                {t("processing")}
                             </>
                         ) : (
-                            "データを送信 (Submit Data)"
+                            t("submitData")
                         )}
                     </button>
                 </div>

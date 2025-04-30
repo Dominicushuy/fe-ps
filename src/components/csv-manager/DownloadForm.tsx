@@ -1,6 +1,7 @@
 // src/components/csv-manager/DownloadForm.tsx
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import {
     DocumentCheckIcon,
     ArrowDownTrayIcon,
@@ -41,6 +42,8 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
     onClearFilters,
     onSubmit,
 }) => {
+    const t = useTranslations();
+
     // Filtered columns list - removed "媒体ID", "CID", "アカウントID", "ドラフト停止日"
     const mockColumns = [
         "キャンペーンID",
@@ -57,11 +60,10 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
             <div className="bg-primary-700 p-4 text-white">
                 <h3 className="text-lg font-medium flex items-center">
                     <ArrowDownTrayIcon className="h-5 w-5 mr-2" />
-                    データダウンロードリクエスト (Data Download Request)
+                    {t("dataDownloadRequest")}
                 </h3>
                 <p className="text-sm text-primary-100 mt-1">
-                    ダウンロードしたいデータを選択してください (Select the data
-                    you want to download)
+                    {t("selectDataToDownload")}
                 </p>
             </div>
 
@@ -78,7 +80,7 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
                     {/* Account Filter - Required */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            アカウント選択 (Account Selection){" "}
+                            {t("accountSelection")}{" "}
                             <span className="text-red-500">*</span>
                         </label>
                         <EnhancedAccountFilter
@@ -88,8 +90,7 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
                         />
                         {selectedAccounts.length === 0 && (
                             <p className="mt-1 text-sm text-red-500">
-                                少なくとも1つのアカウントを選択してください
-                                (Please select at least one account)
+                                {t("pleaseSelectAtLeastOneAccount")}
                             </p>
                         )}
                     </div>
@@ -97,7 +98,7 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
                     {/* Data Layer Filter - No longer selected by default */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            データ層選択 (Data Layer Selection){" "}
+                            {t("dataLayerSelection")}{" "}
                             <span className="text-red-500">*</span>
                         </label>
                         <DataLayerFilter
@@ -107,8 +108,7 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
                         />
                         {selectedDataLayers.length === 0 && (
                             <p className="mt-1 text-sm text-red-500">
-                                少なくとも1つのデータ層を選択してください
-                                (Please select at least one data layer)
+                                {t("pleaseSelectAtLeastOneDataLayer")}
                             </p>
                         )}
                     </div>
@@ -122,9 +122,7 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
                         />
 
                         <div className="mt-3 text-xs text-gray-500">
-                            詳細フィルターを使用して、より具体的な条件でデータをフィルタリングします。
-                            (Use advanced filters to filter data with more
-                            specific conditions.)
+                            {t("advancedFiltersDescription")}
                         </div>
                     </div>
 
@@ -135,13 +133,10 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
                                 <DocumentCheckIcon className="h-5 w-5 text-green-500 mr-2" />
                                 <div>
                                     <p className="text-sm font-medium text-green-800">
-                                        リクエストが正常に送信されました
-                                        (Request successfully submitted)
+                                        {t("requestSuccessfullySubmitted")}
                                     </p>
                                     <p className="text-xs text-green-700 mt-1">
-                                        アクティビティログでプロセスの状態を確認できます。
-                                        (You can check the process status in the
-                                        Activity Log)
+                                        {t("checkProcessStatusInActivityLog")}
                                     </p>
                                 </div>
                             </div>
@@ -191,12 +186,12 @@ const DownloadForm: React.FC<DownloadFormProps> = ({
                                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                                         ></path>
                                     </svg>
-                                    処理中... (Processing...)
+                                    {t("processing")}
                                 </>
                             ) : (
                                 <>
                                     <DocumentCheckIcon className="h-5 w-5 mr-2" />
-                                    保存 (Save)
+                                    {t("save")}
                                 </>
                             )}
                         </button>

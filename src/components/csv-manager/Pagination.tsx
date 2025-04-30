@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
+import { useTranslations } from "next-intl";
 import {
     ChevronLeftIcon,
     ChevronRightIcon,
@@ -25,6 +26,8 @@ export default function Pagination({
     onItemsPerPageChange,
     maxPageButtons = 5,
 }: PaginationProps) {
+    const t = useTranslations();
+
     // Tính toán tổng số trang
     const totalPages = useMemo(() => {
         return Math.max(1, Math.ceil(totalItems / itemsPerPage));
@@ -74,17 +77,17 @@ export default function Pagination({
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             {/* Thông tin về mục đang hiển thị */}
             <div className="text-sm text-gray-700">
-                <span>表示: </span>
+                <span>{t("showing")}: </span>
                 <span className="font-medium text-primary-800">
                     {startIndex}
                 </span>
                 <span> - </span>
                 <span className="font-medium text-primary-800">{endIndex}</span>
-                <span> / </span>
+                <span> {t("of")} </span>
                 <span className="font-medium text-primary-800">
                     {totalItems}
                 </span>
-                <span> 件</span>
+                <span> {t("items")}</span>
             </div>
 
             {/* Điều khiển phân trang */}
@@ -92,7 +95,7 @@ export default function Pagination({
                 {/* Chọn số lượng mục mỗi trang */}
                 <div className="mr-4">
                     <label htmlFor="items-per-page" className="sr-only">
-                        アイテム/ページ
+                        {t("itemsPerPage")}
                     </label>
                     <select
                         id="items-per-page"
@@ -104,7 +107,7 @@ export default function Pagination({
                     >
                         {itemsPerPageOptions.map(option => (
                             <option key={option} value={option}>
-                                {option} 件/ページ
+                                {option} {t("itemsPerPage")}
                             </option>
                         ))}
                     </select>
@@ -125,7 +128,7 @@ export default function Pagination({
                       ? "text-gray-300 cursor-not-allowed"
                       : "text-primary-600 hover:bg-primary-100 hover:text-primary-800"
               }`}
-                        aria-label="First page"
+                        aria-label={t("firstPage")}
                     >
                         <ChevronDoubleLeftIcon className="h-4 w-4" />
                     </button>
@@ -140,7 +143,7 @@ export default function Pagination({
                       ? "text-gray-300 cursor-not-allowed"
                       : "text-primary-600 hover:bg-primary-100 hover:text-primary-800"
               }`}
-                        aria-label="Previous page"
+                        aria-label={t("previousPage")}
                     >
                         <ChevronLeftIcon className="h-4 w-4" />
                     </button>
@@ -181,7 +184,7 @@ export default function Pagination({
                       ? "text-gray-300 cursor-not-allowed"
                       : "text-primary-600 hover:bg-primary-100 hover:text-primary-800"
               }`}
-                        aria-label="Next page"
+                        aria-label={t("nextPage")}
                     >
                         <ChevronRightIcon className="h-4 w-4" />
                     </button>
@@ -196,7 +199,7 @@ export default function Pagination({
                       ? "text-gray-300 cursor-not-allowed"
                       : "text-primary-600 hover:bg-primary-100 hover:text-primary-800"
               }`}
-                        aria-label="Last page"
+                        aria-label={t("lastPage")}
                     >
                         <ChevronDoubleRightIcon className="h-4 w-4" />
                     </button>

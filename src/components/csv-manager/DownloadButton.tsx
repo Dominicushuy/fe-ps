@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useTranslations } from "next-intl";
 import {
     ArrowDownTrayIcon,
     CheckCircleIcon,
@@ -36,6 +37,7 @@ export default function DownloadButton({
     disabled = false,
     handleExportCSV,
 }: DownloadButtonProps) {
+    const t = useTranslations();
     const [exportStatus, setExportStatus] = useState<ExportStatus>(
         ExportStatus.IDLE,
     );
@@ -68,9 +70,7 @@ export default function DownloadButton({
             console.error("Error exporting CSV:", error);
             setExportStatus(ExportStatus.ERROR);
             setErrorMessage(
-                error instanceof Error
-                    ? error.message
-                    : "エクスポート中にエラーが発生しました (Error occurred during export)",
+                error instanceof Error ? error.message : t("errorDuringExport"),
             );
 
             // Tự động reset trạng thái lỗi sau 5 giây
@@ -95,7 +95,7 @@ export default function DownloadButton({
                             className="mr-2 -ml-1 h-5 w-5 animate-spin"
                             aria-hidden="true"
                         />
-                        エクスポート中... (Exporting...)
+                        {t("exporting")}
                     </button>
                 );
 
@@ -110,7 +110,7 @@ export default function DownloadButton({
                             className="mr-2 -ml-1 h-5 w-5"
                             aria-hidden="true"
                         />
-                        エクスポート完了! (Export completed!)
+                        {t("exportCompleted")}
                     </button>
                 );
 
@@ -125,7 +125,7 @@ export default function DownloadButton({
                             className="mr-2 -ml-1 h-5 w-5"
                             aria-hidden="true"
                         />
-                        再試行 (Retry)
+                        {t("retry")}
                     </button>
                 );
 
@@ -146,11 +146,13 @@ export default function DownloadButton({
                             className="mr-2 -ml-1 h-5 w-5"
                             aria-hidden="true"
                         />
-                        CSVエクスポート (Export CSV)
+                        {t("exportCsv")}
                     </button>
                 );
         }
     };
+
+    const filteredDataCount = applyFilters(data, filters, searchTerm).length;
 
     return (
         <div>
@@ -165,8 +167,12 @@ export default function DownloadButton({
             {exportStatus === ExportStatus.SUCCESS && (
                 <div className="mt-2 text-sm text-green-600">
                     {filters.length > 0 || searchTerm
-                        ? `フィルタリングされた ${applyFilters(data, filters, searchTerm).length} レコードがエクスポートされました。`
-                        : `${data.length} レコードがエクスポートされました。`}
+                        ? t("filteredRecordsExported", {
+                              "0": filteredDataCount.toString(),
+                          })
+                        : t("recordsExported", {
+                              "0": data.length.toString(),
+                          })}
                 </div>
             )}
         </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useTranslations } from "next-intl";
 import {
     PlusIcon,
     MinusIcon,
@@ -28,6 +29,7 @@ export default function FilterPanel({
     onFilterChange,
     columns,
 }: FilterPanelProps) {
+    const t = useTranslations();
     const [isExpanded, setIsExpanded] = useState(true);
 
     // Thêm một filter mới
@@ -65,22 +67,22 @@ export default function FilterPanel({
     const getOperatorSymbol = (operator: FilterOperator): string => {
         switch (operator) {
             case "ALL":
-                return "全て";
+                return t("all");
             case "CASE_CONTAIN_AND":
             case "CONTAIN_AND":
-                return "含む AND";
+                return t("containsAnd");
             case "CASE_CONTAIN_OR":
             case "CONTAIN_OR":
-                return "含む OR";
+                return t("containsOr");
             case "CASE_NOT_CONTAIN":
             case "NOT_CONTAIN":
-                return "含まない";
+                return t("notContains");
             case "CASE_START_WITH":
             case "START_WITH":
-                return "始まる";
+                return t("startsWith");
             case "CASE_END_WITH":
             case "END_WITH":
-                return "終わる";
+                return t("endsWith");
             case "CASE_EQUAL":
             case "EQUAL":
                 return "=";
@@ -88,7 +90,7 @@ export default function FilterPanel({
             case "NOT_EQUAL":
                 return "≠";
             case "other":
-                return "その他";
+                return t("other");
             default:
                 return "";
         }
@@ -108,7 +110,7 @@ export default function FilterPanel({
                 <div className="flex items-center">
                     <AdjustmentsHorizontalIcon className="h-5 w-5 text-primary-700 mr-2" />
                     <h3 className="text-sm font-medium text-gray-700">
-                        詳細フィルター (Advanced Filters)
+                        {t("advancedFilters")}
                     </h3>
                     {filters.length > 0 && (
                         <span className="ml-2 px-2 py-0.5 text-xs font-medium bg-primary-100 text-primary-800 rounded-full">
@@ -125,10 +127,10 @@ export default function FilterPanel({
                                 handleClearAllFilters();
                             }}
                             className="flex items-center text-xs text-gray-500 hover:text-red-500 mr-3 transition-colors"
-                            title="すべてクリア (Clear All)"
+                            title={t("clearAll")}
                         >
                             <TrashIcon className="h-3 w-3 mr-1" />
-                            クリア (Clear All)
+                            {t("clearAll")}
                         </button>
                     )}
                     {isExpanded ? (
@@ -160,12 +162,10 @@ export default function FilterPanel({
                             <div className="py-6 text-center">
                                 <FunnelIcon className="mx-auto h-8 w-8 text-gray-300" />
                                 <p className="mt-2 text-gray-500 text-sm">
-                                    フィルターなし (No filters applied)
+                                    {t("noFilters")}
                                 </p>
                                 <p className="text-gray-400 text-xs mt-1">
-                                    データをフィルタリングするには、下のボタンをクリックしてください
-                                    <br />
-                                    (Click the button below to filter data)
+                                    {t("clickButtonToFilterData")}
                                 </p>
                             </div>
                         )}
@@ -184,7 +184,7 @@ export default function FilterPanel({
                                 className="w-full sm:w-auto flex items-center justify-center px-4 py-2 text-sm text-white bg-primary-600 hover:bg-primary-700 rounded-md shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
                             >
                                 <PlusIcon className="h-4 w-4 mr-1" />
-                                フィルター追加 (Add Filter)
+                                {t("addFilter")}
                             </button>
                         </div>
                     </div>
@@ -218,7 +218,7 @@ export default function FilterPanel({
                                         handleRemoveFilter(filter.id);
                                     }}
                                     className="ml-1 text-primary-700 hover:text-red-500 transition-colors"
-                                    title="削除 (Remove)"
+                                    title={t("remove")}
                                 >
                                     <MinusIcon className="h-3 w-3" />
                                 </button>

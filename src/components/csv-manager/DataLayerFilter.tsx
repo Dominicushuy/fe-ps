@@ -1,6 +1,5 @@
-// src/components/csv-manager/DataLayerFilter.tsx
-
 import React, { useEffect } from "react";
+import { useTranslations } from "next-intl";
 import { DataLayer, DataLayerUIOption } from "@/types";
 
 interface DataLayerFilterProps {
@@ -14,6 +13,8 @@ export default function DataLayerFilter({
     onLayerChange,
     defaultSelectAll = false,
 }: DataLayerFilterProps) {
+    const t = useTranslations();
+
     // Define the available data layers for UI display
     const dataLayerOptions: {
         value: DataLayerUIOption;
@@ -22,7 +23,7 @@ export default function DataLayerFilter({
     }[] = [
         {
             value: "campaign",
-            label: "キャンペーン (Campaign)",
+            label: t("campaign"),
             icon: (
                 <svg
                     className="h-5 w-5"
@@ -41,7 +42,7 @@ export default function DataLayerFilter({
         },
         {
             value: "ad_group",
-            label: "広告グループ (Ad Group)",
+            label: t("adGroup"),
             icon: (
                 <svg
                     className="h-5 w-5"
@@ -60,7 +61,7 @@ export default function DataLayerFilter({
         },
         {
             value: "ad",
-            label: "広告 (Ad)",
+            label: t("ad"),
             icon: (
                 <svg
                     className="h-5 w-5"
@@ -79,7 +80,7 @@ export default function DataLayerFilter({
         },
         {
             value: "keyword",
-            label: "キーワード (Keyword)",
+            label: t("keyword"),
             icon: (
                 <svg
                     className="h-5 w-5"
@@ -221,9 +222,9 @@ export default function DataLayerFilter({
 
     // Helper to get display name for a layer
     const getDisplayName = (layer: DataLayer): string => {
-        if (layer === "ad_group") return "Adgroup";
-        if (layer === "ad_and_keyword") return "Ad+Keyword";
-        return layer.charAt(0).toUpperCase() + layer.slice(1);
+        if (layer === "ad_group") return t("adGroup");
+        if (layer === "ad_and_keyword") return t("adAndKeyword");
+        return t(layer);
     };
 
     return (
@@ -256,10 +257,7 @@ export default function DataLayerFilter({
                                 {layer.icon}
                             </span>
                             <span className="text-sm font-medium">
-                                {layer.value === "ad_group"
-                                    ? "Adgroup"
-                                    : layer.value.charAt(0).toUpperCase() +
-                                      layer.value.slice(1)}
+                                {layer.label}
                             </span>
                         </button>
                     );
@@ -269,12 +267,10 @@ export default function DataLayerFilter({
             {/* Display selected layers */}
             <div className="mt-2 text-xs text-gray-500">
                 {selectedLayers.length === 0
-                    ? "データ層が選択されていません (No data layers selected)"
-                    : `選択された層: ${selectedLayers
-                          .map(getDisplayName)
-                          .join(", ")} (Selected layers: ${selectedLayers
-                          .map(getDisplayName)
-                          .join(", ")})`}
+                    ? t("noDataLayersSelected")
+                    : t("selectedLayers", {
+                          "0": selectedLayers.map(getDisplayName).join(", "),
+                      })}
             </div>
         </div>
     );

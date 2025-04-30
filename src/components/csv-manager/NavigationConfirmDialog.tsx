@@ -5,6 +5,7 @@ import {
     ArrowTopRightOnSquareIcon,
 } from "@heroicons/react/24/outline";
 import { Client } from "@/types";
+import { useTranslations } from "next-intl";
 
 interface NavigationConfirmDialogProps {
     isOpen: boolean;
@@ -19,6 +20,8 @@ export default function NavigationConfirmDialog({
     onConfirm,
     client,
 }: NavigationConfirmDialogProps) {
+    const t = useTranslations();
+
     return (
         <Transition.Root show={isOpen} as={Fragment}>
             <Dialog as="div" className="relative z-10" onClose={onClose}>
@@ -58,18 +61,13 @@ export default function NavigationConfirmDialog({
                                             as="h3"
                                             className="text-base font-semibold leading-6 text-gray-900"
                                         >
-                                            アクティビティログに移動 (Navigate
-                                            to Activity Log)
+                                            {t("navigateToActivityLog")}
                                         </Dialog.Title>
                                         <div className="mt-2">
                                             <p className="text-sm text-gray-500">
-                                                データが正常にアップロードされました。このクライアントのアクティビティログを確認しますか？
-                                            </p>
-                                            <p className="text-sm text-gray-500 mt-1">
-                                                (Data has been successfully
-                                                uploaded. Would you like to
-                                                check the activity log for this
-                                                client?)
+                                                {t(
+                                                    "uploadSuccessConfirmNavigation",
+                                                )}
                                             </p>
 
                                             {client && (
@@ -77,9 +75,10 @@ export default function NavigationConfirmDialog({
                                                     <div className="flex flex-col gap-2">
                                                         <div>
                                                             <p className="text-xs text-gray-500">
-                                                                選択されたクライアント
-                                                                (Selected
-                                                                Client):
+                                                                {t(
+                                                                    "selectedClient",
+                                                                )}
+                                                                :
                                                             </p>
                                                             <p className="text-sm font-medium text-primary-700">
                                                                 {`${client.accountId} - ${client.name}`}
@@ -98,15 +97,14 @@ export default function NavigationConfirmDialog({
                                         onClick={onConfirm}
                                     >
                                         <ArrowTopRightOnSquareIcon className="h-4 w-4 mr-1.5" />
-                                        アクティビティログに移動 (Go to Activity
-                                        Log)
+                                        {t("goToActivityLog")}
                                     </button>
                                     <button
                                         type="button"
                                         className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
                                         onClick={onClose}
                                     >
-                                        キャンセル (Cancel)
+                                        {t("cancel")}
                                     </button>
                                 </div>
                             </Dialog.Panel>

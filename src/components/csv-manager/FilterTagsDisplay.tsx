@@ -1,6 +1,7 @@
 // src/components/csv-manager/FilterTagsDisplay.tsx
 
 import React from "react";
+import { useTranslations } from "next-intl";
 import { FunnelIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { MediaAccount, ColumnFilter } from "@/types";
 import MediaLogo from "./MediaLogo";
@@ -19,6 +20,8 @@ const FilterTagsDisplay: React.FC<FilterTagsDisplayProps> = ({
     filters,
     onClearFilters,
 }) => {
+    const t = useTranslations();
+
     // Only render if there are any filters applied
     if (selectedAccounts.length === 0 && filters.length === 0) {
         return null;
@@ -27,7 +30,7 @@ const FilterTagsDisplay: React.FC<FilterTagsDisplayProps> = ({
     return (
         <div className="mb-5 bg-blue-50 p-3 rounded-lg border border-blue-100">
             <h4 className="text-sm font-medium text-blue-700 mb-2">
-                適用フィルター (Applied Filters)
+                {t("appliedFilters")}
             </h4>
 
             {/* Account tags */}
@@ -54,7 +57,7 @@ const FilterTagsDisplay: React.FC<FilterTagsDisplayProps> = ({
                     {/* Show count if there are more than 5 accounts */}
                     {selectedAccounts.length > 5 && (
                         <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
-                            +{selectedAccounts.length - 5} more
+                            +{selectedAccounts.length - 5} {t("more")}
                         </span>
                     )}
                 </div>
@@ -65,13 +68,13 @@ const FilterTagsDisplay: React.FC<FilterTagsDisplayProps> = ({
                 <div className="flex items-center">
                     <FunnelIcon className="h-4 w-4 text-blue-600 mr-1" />
                     <span className="text-xs font-medium text-blue-700">
-                        Advanced filters: {filters.length}
+                        {t("advancedFilters")}: {filters.length}
                     </span>
                     <button
                         onClick={onClearFilters}
                         className="ml-2 text-xs text-red-600 hover:text-red-800"
                     >
-                        クリア (Clear)
+                        {t("clear")}
                     </button>
                 </div>
             )}
