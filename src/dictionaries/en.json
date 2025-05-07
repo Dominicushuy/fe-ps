@@ -170,5 +170,9 @@
     "enterValuePerLine": "Enter values... (one per line)",
     "noAvailableAccounts": "No available accounts",
     "pleaseSelectClient": "Please select a client",
-    "csvMustIncludeColumns": "Your CSV file must include these columns"
+    "csvMustIncludeColumns": "Your CSV file must include these columns",
+    "selectEmployee": "Select Employee",
+    "searchEmployee": "Search employee",
+    "selectedEmployee": "Selected Employee",
+    "employee": "Employee"
 }

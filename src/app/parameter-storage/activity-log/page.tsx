@@ -3,9 +3,8 @@
 
 import React, { useState } from "react";
 import ClientSelect from "@/components/csv-manager/ClientSelect";
+import EmployeeSelect from "@/components/activity-manager/EmployeeSelect";
 import DateRangeFilter from "@/components/activity-manager/DateRangeFilter";
-import TypeFilter from "@/components/activity-manager/TypeFilter";
-import StatusFilter from "@/components/activity-manager/StatusFilter";
 import ActivityTable from "@/components/activity-manager/ActivityTable";
 import Pagination from "@/components/csv-manager/Pagination";
 import SearchBar from "@/components/csv-manager/SearchBar";
@@ -24,6 +23,7 @@ import {
     XMarkIcon,
     ArrowPathIcon,
     MagnifyingGlassIcon,
+    UserIcon,
 } from "@heroicons/react/24/outline";
 import { Activity } from "@/types";
 import { useTranslations } from "next-intl";
@@ -40,6 +40,7 @@ export default function ActivityLogPage() {
         itemsPerPage,
         totalItems,
         handleClientSelect,
+        handleEmployeeSelect,
         handleDateOptionChange,
         handleCustomDateChange,
         handleTypeChange,
@@ -108,63 +109,254 @@ export default function ActivityLogPage() {
                         </button>
                     </div>
 
-                    {/* Filter container */}
+                    {/* Filter container with improved layout */}
                     <div
                         className={`${
                             showFilters ? "block" : "hidden"
-                        } md:block bg-gray-50 p-4 rounded-lg mb-6`}
+                        } md:block mb-6`}
                     >
-                        <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center">
-                                <AdjustmentsHorizontalIcon className="h-5 w-5 text-primary-600 mr-2" />
-                                <h3 className="text-base font-medium text-primary-900">
-                                    {t("filters")}
-                                </h3>
-                            </div>
+                        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+                            {/* Header with search */}
+                            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                                <div className="flex items-center">
+                                    <AdjustmentsHorizontalIcon className="h-5 w-5 text-primary-600 mr-2" />
+                                    <h3 className="text-base font-medium text-primary-900">
+                                        {t("filters")}
+                                    </h3>
+                                </div>
 
-                            {/* Clear all filters button */}
-                            <button
-                                className="text-xs text-gray-500 hover:text-red-500 flex items-center"
-                                onClick={() => {
-                                    handleClientSelect(null);
-                                    handleDateOptionChange("Last7Days");
-                                    handleTypeChange("All");
-                                    handleStatusChange("All");
-                                    handleSearchChange("");
-                                }}
-                            >
-                                <XMarkIcon className="h-3 w-3 mr-1" />
-                                {t("clearAll")}
-                            </button>
-                        </div>
-
-                        {/* Add Search Bar above the filters */}
-                        <div className="mb-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                {t("search")}
-                            </label>
-                            <SearchBar
-                                searchTerm={filters.searchTerm}
-                                onSearch={handleSearchChange}
-                                placeholder={t("searchPlaceholder")}
-                                debounceMs={500}
-                            />
-                        </div>
-
-                        {/* Two-column layout for filters on larger screens */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            {/* Left column - Client and Date Range */}
-                            <div className="space-y-4">
-                                {/* ClientSelect */}
-                                <div className="bg-white p-3 rounded-md border border-gray-200 shadow-sm">
-                                    <ClientSelect
-                                        selectedClient={filters.client}
-                                        onClientSelect={handleClientSelect}
+                                {/* Search bar - taking reasonable width */}
+                                <div className="flex-grow max-w-lg">
+                                    <SearchBar
+                                        searchTerm={filters.searchTerm}
+                                        onSearch={handleSearchChange}
+                                        placeholder={t("searchPlaceholder")}
+                                        debounceMs={500}
                                     />
                                 </div>
 
-                                {/* DateRangeFilter */}
-                                <div className="bg-white p-3 rounded-md border border-gray-200 shadow-sm">
+                                {/* Clear button */}
+                                <button
+                                    className="text-xs text-gray-500 hover:text-red-500 flex items-center whitespace-nowrap"
+                                    onClick={() => {
+                                        handleClientSelect(null);
+                                        handleEmployeeSelect(null);
+                                        handleDateOptionChange("Last7Days");
+                                        handleTypeChange("All");
+                                        handleStatusChange("All");
+                                        handleSearchChange("");
+                                    }}
+                                >
+                                    <XMarkIcon className="h-3 w-3 mr-1" />
+                                    {t("clearAll")}
+                                </button>
+                            </div>
+
+                            {/* Main filter grid - 3 columns on large screens */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                {/* Column 1: Client, Employee selectors */}
+                                <div className="space-y-4">
+                                    {/* Client selector */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            {t("selectClient")}
+                                        </label>
+                                        <ClientSelect
+                                            selectedClient={filters.client}
+                                            onClientSelect={handleClientSelect}
+                                        />
+                                    </div>
+
+                                    {/* Employee selector */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            {t("selectEmployee")}
+                                        </label>
+                                        <EmployeeSelect
+                                            selectedEmployee={filters.employee}
+                                            onEmployeeSelect={
+                                                handleEmployeeSelect
+                                            }
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Column 2: Type and Status filters */}
+                                <div className="space-y-4">
+                                    {/* Type filter */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            {t("typeFilter")}
+                                        </label>
+                                        <div className="flex rounded-md shadow-sm">
+                                            <button
+                                                type="button"
+                                                className={`flex-1 px-3 py-2 text-sm font-medium rounded-l-md border 
+                                                    ${
+                                                        filters.type === "All"
+                                                            ? "bg-primary-600 text-white border-primary-700"
+                                                            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                                                    }`}
+                                                onClick={() =>
+                                                    handleTypeChange("All")
+                                                }
+                                            >
+                                                {t("all")}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={`flex-1 px-3 py-2 text-sm font-medium border-t border-b 
+                                                    ${
+                                                        filters.type ===
+                                                        "Download"
+                                                            ? "bg-primary-600 text-white border-primary-700"
+                                                            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                                                    }`}
+                                                onClick={() =>
+                                                    handleTypeChange("Download")
+                                                }
+                                            >
+                                                <div className="flex items-center justify-center">
+                                                    <ArrowDownTrayIcon className="h-4 w-4 mr-1" />
+                                                    <span>{t("download")}</span>
+                                                </div>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={`flex-1 px-3 py-2 text-sm font-medium rounded-r-md border 
+                                                    ${
+                                                        filters.type ===
+                                                        "Upload"
+                                                            ? "bg-primary-600 text-white border-primary-700"
+                                                            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                                                    }`}
+                                                onClick={() =>
+                                                    handleTypeChange("Upload")
+                                                }
+                                            >
+                                                <div className="flex items-center justify-center">
+                                                    <ArrowUpTrayIcon className="h-4 w-4 mr-1" />
+                                                    <span>{t("upload")}</span>
+                                                </div>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    {/* Status filter - using grid for better alignment */}
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            {t("statusFilter")}
+                                        </label>
+                                        <div className="grid grid-cols-3 gap-1">
+                                            <button
+                                                type="button"
+                                                className={`px-3 py-2 text-sm font-medium rounded-md border
+                                                    ${
+                                                        filters.status === "All"
+                                                            ? "bg-primary-600 text-white border-primary-700"
+                                                            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                                                    }`}
+                                                onClick={() =>
+                                                    handleStatusChange("All")
+                                                }
+                                            >
+                                                {t("all")}
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={`px-3 py-2 text-sm font-medium rounded-md border flex items-center justify-center
+                                                    ${
+                                                        filters.status ===
+                                                        "waiting"
+                                                            ? "bg-yellow-600 text-white border-yellow-700"
+                                                            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                                                    }`}
+                                                onClick={() =>
+                                                    handleStatusChange(
+                                                        "waiting",
+                                                    )
+                                                }
+                                            >
+                                                <ClockIcon className="h-4 w-4 mr-1" />
+                                                <span>{t("waiting")}</span>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={`px-3 py-2 text-sm font-medium rounded-md border flex items-center justify-center
+                                                    ${
+                                                        filters.status ===
+                                                        "processing"
+                                                            ? "bg-blue-600 text-white border-blue-700"
+                                                            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                                                    }`}
+                                                onClick={() =>
+                                                    handleStatusChange(
+                                                        "processing",
+                                                    )
+                                                }
+                                            >
+                                                <ClockIcon className="h-4 w-4 mr-1 animate-spin" />
+                                                <span>{t("processing")}</span>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={`px-3 py-2 text-sm font-medium rounded-md border flex items-center justify-center
+                                                    ${
+                                                        filters.status ===
+                                                        "done"
+                                                            ? "bg-green-600 text-white border-green-700"
+                                                            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                                                    }`}
+                                                onClick={() =>
+                                                    handleStatusChange("done")
+                                                }
+                                            >
+                                                <CheckCircleIcon className="h-4 w-4 mr-1" />
+                                                <span>{t("done")}</span>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={`px-3 py-2 text-sm font-medium rounded-md border flex items-center justify-center
+                                                    ${
+                                                        filters.status ===
+                                                        "invalid"
+                                                            ? "bg-orange-600 text-white border-orange-700"
+                                                            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                                                    }`}
+                                                onClick={() =>
+                                                    handleStatusChange(
+                                                        "invalid",
+                                                    )
+                                                }
+                                            >
+                                                <XCircleIcon className="h-4 w-4 mr-1" />
+                                                <span>{t("invalid")}</span>
+                                            </button>
+                                            <button
+                                                type="button"
+                                                className={`px-3 py-2 text-sm font-medium rounded-md border flex items-center justify-center
+                                                    ${
+                                                        filters.status ===
+                                                        "error"
+                                                            ? "bg-red-600 text-white border-red-700"
+                                                            : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                                                    }`}
+                                                onClick={() =>
+                                                    handleStatusChange("error")
+                                                }
+                                            >
+                                                <ExclamationCircleIcon className="h-4 w-4 mr-1" />
+                                                <span>{t("error")}</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Column 3: Date filter */}
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        {t("dateFilter")}
+                                    </label>
                                     <DateRangeFilter
                                         dateOption={filters.dateOption}
                                         customStartDate={
@@ -181,117 +373,153 @@ export default function ActivityLogPage() {
                                 </div>
                             </div>
 
-                            {/* Right column - Type and Status */}
-                            <div className="space-y-4">
-                                {/* TypeFilter */}
-                                <div className="bg-white p-3 rounded-md border border-gray-200 shadow-sm">
-                                    <TypeFilter
-                                        selectedType={filters.type}
-                                        onTypeChange={handleTypeChange}
-                                    />
-                                </div>
+                            {/* Active filters display */}
+                            {(filters.client ||
+                                filters.employee ||
+                                filters.type !== "All" ||
+                                filters.status !== "All" ||
+                                filters.searchTerm ||
+                                filters.dateOption !== "Last7Days") && (
+                                <div className="mt-4 pt-3 border-t border-gray-200">
+                                    <h4 className="text-xs font-medium text-gray-500 mb-2">
+                                        {t("appliedFilters")}:
+                                    </h4>
+                                    <div className="flex flex-wrap gap-2">
+                                        {/* Client filter chip */}
+                                        {filters.client && (
+                                            <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
+                                                <span className="mr-1">👤</span>
+                                                {filters.client.name}
+                                                <button
+                                                    onClick={() =>
+                                                        handleClientSelect(null)
+                                                    }
+                                                    className="ml-1 text-primary-600 hover:text-primary-800"
+                                                >
+                                                    <XMarkIcon className="h-3 w-3" />
+                                                </button>
+                                            </div>
+                                        )}
 
-                                {/* StatusFilter */}
-                                <div className="bg-white p-3 rounded-md border border-gray-200 shadow-sm">
-                                    <StatusFilter
-                                        selectedStatus={filters.status}
-                                        onStatusChange={handleStatusChange}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                                        {/* Employee filter chip */}
+                                        {filters.employee && (
+                                            <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                                <UserIcon className="h-3 w-3 mr-1" />
+                                                {filters.employee.employee_id}
+                                                <button
+                                                    onClick={() =>
+                                                        handleEmployeeSelect(
+                                                            null,
+                                                        )
+                                                    }
+                                                    className="ml-1 text-indigo-600 hover:text-indigo-800"
+                                                >
+                                                    <XMarkIcon className="h-3 w-3" />
+                                                </button>
+                                            </div>
+                                        )}
 
-                    {/* Active Filters Summary - Horizontal chips */}
-                    <div className="mb-6 bg-white p-3 rounded-lg border border-gray-200 shadow-sm">
-                        <h4 className="text-sm font-medium text-gray-700 mb-2">
-                            {t("appliedFilters")}
-                        </h4>
+                                        {/* Date filter chip */}
+                                        {filters.dateOption !== "Last7Days" && (
+                                            <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                <CalendarIcon className="h-3 w-3 mr-1" />
+                                                {filters.dateOption ===
+                                                    "Custom" &&
+                                                filters.customStartDate
+                                                    ? `${filters.customStartDate.toLocaleDateString()} - ${
+                                                          filters.customEndDate?.toLocaleDateString() ||
+                                                          t("now")
+                                                      }`
+                                                    : t(
+                                                          filters.dateOption.toLowerCase(),
+                                                      )}
+                                                <button
+                                                    onClick={() =>
+                                                        handleDateOptionChange(
+                                                            "Last7Days",
+                                                        )
+                                                    }
+                                                    className="ml-1 text-blue-600 hover:text-blue-800"
+                                                >
+                                                    <XMarkIcon className="h-3 w-3" />
+                                                </button>
+                                            </div>
+                                        )}
 
-                        <div className="flex flex-wrap gap-2 items-center">
-                            {/* Client filter chip */}
-                            <div
-                                className={`px-3 py-1.5 rounded-full text-xs font-medium 
-                ${
-                    filters.client
-                        ? "bg-primary-100 text-primary-800"
-                        : "bg-gray-100 text-gray-700"
-                }`}
-                            >
-                                <span className="mr-1">👤</span>
-                                {t("client")}:{" "}
-                                {filters.client
-                                    ? filters.client.name
-                                    : t("all")}
-                            </div>
+                                        {/* Type filter chip */}
+                                        {filters.type !== "All" && (
+                                            <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                                {filters.type === "Download" ? (
+                                                    <ArrowDownTrayIcon className="h-3 w-3 mr-1" />
+                                                ) : (
+                                                    <ArrowUpTrayIcon className="h-3 w-3 mr-1" />
+                                                )}
+                                                {t(filters.type.toLowerCase())}
+                                                <button
+                                                    onClick={() =>
+                                                        handleTypeChange("All")
+                                                    }
+                                                    className="ml-1 text-purple-600 hover:text-purple-800"
+                                                >
+                                                    <XMarkIcon className="h-3 w-3" />
+                                                </button>
+                                            </div>
+                                        )}
 
-                            {/* Date filter chip */}
-                            <div className="bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-xs font-medium">
-                                <CalendarIcon className="h-3 w-3 mr-1 inline" />
-                                {filters.dateOption === "Custom" &&
-                                filters.customStartDate
-                                    ? `${filters.customStartDate.toLocaleDateString()} - ${
-                                          filters.customEndDate?.toLocaleDateString() ||
-                                          t("now")
-                                      }`
-                                    : t(filters.dateOption.toLowerCase())}
-                            </div>
+                                        {/* Status filter chip */}
+                                        {filters.status !== "All" && (
+                                            <div
+                                                className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium 
+                                                bg-green-100 text-green-800"
+                                            >
+                                                {filters.status === "done" && (
+                                                    <CheckCircleIcon className="h-3 w-3 mr-1" />
+                                                )}
+                                                {filters.status ===
+                                                    "processing" && (
+                                                    <ClockIcon className="h-3 w-3 mr-1 animate-spin" />
+                                                )}
+                                                {filters.status ===
+                                                    "waiting" && (
+                                                    <ClockIcon className="h-3 w-3 mr-1" />
+                                                )}
+                                                {filters.status ===
+                                                    "invalid" && (
+                                                    <XCircleIcon className="h-3 w-3 mr-1" />
+                                                )}
+                                                {filters.status === "error" && (
+                                                    <ExclamationCircleIcon className="h-3 w-3 mr-1" />
+                                                )}
+                                                {t(filters.status)}
+                                                <button
+                                                    onClick={() =>
+                                                        handleStatusChange(
+                                                            "All",
+                                                        )
+                                                    }
+                                                    className="ml-1 text-green-600 hover:text-green-800"
+                                                >
+                                                    <XMarkIcon className="h-3 w-3" />
+                                                </button>
+                                            </div>
+                                        )}
 
-                            {/* Type filter chip */}
-                            <div
-                                className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center
-                ${
-                    filters.type !== "All"
-                        ? filters.type === "Download"
-                            ? "bg-purple-100 text-purple-800"
-                            : "bg-indigo-100 text-indigo-800"
-                        : "bg-gray-100 text-gray-700"
-                }`}
-                            >
-                                {filters.type === "Download" ? (
-                                    <ArrowDownTrayIcon className="h-3 w-3 mr-1" />
-                                ) : filters.type === "Upload" ? (
-                                    <ArrowUpTrayIcon className="h-3 w-3 mr-1" />
-                                ) : null}
-                                {t("type")}: {t(filters.type.toLowerCase())}
-                            </div>
-
-                            {/* Status filter chip */}
-                            <div
-                                className={`px-3 py-1.5 rounded-full text-xs font-medium flex items-center
-                ${
-                    filters.status === "done"
-                        ? "bg-green-100 text-green-800"
-                        : filters.status === "processing"
-                        ? "bg-blue-100 text-blue-800"
-                        : filters.status === "waiting"
-                        ? "bg-yellow-100 text-yellow-800"
-                        : filters.status === "invalid"
-                        ? "bg-orange-100 text-orange-800"
-                        : filters.status === "error"
-                        ? "bg-red-100 text-red-800"
-                        : "bg-gray-100 text-gray-700"
-                }`}
-                            >
-                                {filters.status === "done" ? (
-                                    <CheckCircleIcon className="h-3 w-3 mr-1" />
-                                ) : filters.status === "processing" ? (
-                                    <ClockIcon className="h-3 w-3 mr-1 animate-spin" />
-                                ) : filters.status === "waiting" ? (
-                                    <ClockIcon className="h-3 w-3 mr-1" />
-                                ) : filters.status === "invalid" ? (
-                                    <XCircleIcon className="h-3 w-3 mr-1" />
-                                ) : filters.status === "error" ? (
-                                    <ExclamationCircleIcon className="h-3 w-3 mr-1" />
-                                ) : null}
-                                {t("status")}: {t(filters.status)}
-                            </div>
-
-                            {/* Search term chip */}
-                            {filters.searchTerm && (
-                                <div className="bg-blue-100 text-blue-800 px-3 py-1.5 rounded-full text-xs font-medium flex items-center">
-                                    <MagnifyingGlassIcon className="h-3 w-3 mr-1" />
-                                    {t("search")}: {filters.searchTerm}
+                                        {/* Search term chip */}
+                                        {filters.searchTerm && (
+                                            <div className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                                <MagnifyingGlassIcon className="h-3 w-3 mr-1" />
+                                                {filters.searchTerm}
+                                                <button
+                                                    onClick={() =>
+                                                        handleSearchChange("")
+                                                    }
+                                                    className="ml-1 text-blue-600 hover:text-blue-800"
+                                                >
+                                                    <XMarkIcon className="h-3 w-3" />
+                                                </button>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             )}
                         </div>

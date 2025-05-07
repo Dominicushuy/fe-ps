@@ -1,57 +1,55 @@
-// src/components/csv-manager/ClientSelect.tsx
-import React, { useState, useMemo } from "react";
+// src/components/activity-manager/EmployeeSelect.tsx
+import React, { useMemo } from "react";
 import Select from "react-select";
-import { useDebounce } from "use-debounce";
-import { Client } from "@/types";
-import { UserCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { useClients } from "@/hooks/useClients";
+import { UserIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useEmployees } from "@/hooks/useEmployees";
 import { useTranslations } from "next-intl";
+import { Employee } from "@/types";
 
-interface ClientSelectProps {
-    selectedClient: Client | null;
-    onClientSelect: (client: Client | null) => void;
+interface EmployeeSelectProps {
+    selectedEmployee: Employee | null;
+    onEmployeeSelect: (employee: Employee | null) => void;
     disabled?: boolean;
 }
 
 // Define type for options
-interface ClientOption {
+interface EmployeeOption {
     value: string;
     label: string;
-    client: Client;
+    employee: Employee;
 }
 
-export default function ClientSelect({
-    selectedClient,
-    onClientSelect,
+export default function EmployeeSelect({
+    selectedEmployee,
+    onEmployeeSelect,
     disabled = false,
-}: ClientSelectProps) {
+}: EmployeeSelectProps) {
     const t = useTranslations();
-    // State to store input search value
-    const [inputValue, setInputValue] = useState("");
-    // Debounce search (500ms)
-    const [debouncedInputValue] = useDebounce(inputValue, 500);
 
-    // Usar el hook useClients para obtener los datos
-    const { clients, isLoading } = useClients({
-        search: debouncedInputValue,
-        limit: 20,
-    });
+    // Use the hook to fetch employees
+    const { data: employees = [], isLoading } = useEmployees();
 
-    // Convertir los clientes en opciones para el select
+    // Convert employees to options for the select
     const options = useMemo(() => {
-        return clients.map(client => ({
-            value: client.id,
-            label: `${client.accountId} - ${client.name}`,
-            client: client,
+        return employees.map(employee => ({
+            value: employee.employee_id,
+            label: `${employee.employee_id}${
+                employee.employee_name ? ` - ${employee.employee_name}` : ""
+            }`,
+            employee,
         }));
-    }, [clients]);
+    }, [employees]);
 
-    // Convertir el cliente seleccionado a formato de opción
-    const selectedOption = selectedClient
+    // Convert the selected employee to option format
+    const selectedOption = selectedEmployee
         ? {
-              value: selectedClient.id,
-              label: `${selectedClient.accountId} - ${selectedClient.name}`,
-              client: selectedClient,
+              value: selectedEmployee.employee_id,
+              label: `${selectedEmployee.employee_id}${
+                  selectedEmployee.employee_name
+                      ? ` - ${selectedEmployee.employee_name}`
+                      : ""
+              }`,
+              employee: selectedEmployee,
           }
         : null;
 
@@ -59,37 +57,26 @@ export default function ClientSelect({
         <div className="w-full max-w-md">
             <div className="relative">
                 <div className="absolute inset-y-0 left-0 flex items-center pl-3 z-10 pointer-events-none">
-                    <UserCircleIcon
+                    <UserIcon
                         className="h-5 w-5 text-gray-400"
                         aria-hidden="true"
                     />
                 </div>
                 <Select
                     value={selectedOption}
-                    onChange={(option: ClientOption | null) => {
-                        onClientSelect(option ? option.client : null);
-                        if (!option) {
-                            setInputValue("");
-                        }
+                    onChange={(option: EmployeeOption | null) => {
+                        onEmployeeSelect(option ? option.employee : null);
                     }}
                     options={options}
                     isDisabled={disabled}
                     isLoading={isLoading}
                     isClearable
-                    placeholder={t("searchClient")}
+                    placeholder={t("searchEmployee")}
                     loadingMessage={() => t("loading")}
                     noOptionsMessage={() => t("noResultsFound")}
-                    // Control input value
-                    // inputValue={inputValue}
-                    onInputChange={(newValue, actionMeta) => {
-                        // Only update when user actually types or deletes content
-                        if (actionMeta.action === "input-change") {
-                            setInputValue(newValue);
-                        }
-                    }}
                     // Other options
                     className={`select-component ${
-                        selectedClient ? "has-value" : ""
+                        selectedEmployee ? "has-value" : ""
                     }`}
                     classNamePrefix="select"
                 />
@@ -106,7 +93,7 @@ export default function ClientSelect({
                     box-shadow: 0 0 0 1px #4f46e5;
                 }
                 .select-component .select__control:hover {
-                    border-color: ${selectedClient ? "#4f46e5" : "#d1d5db"};
+                    border-color: ${selectedEmployee ? "#4f46e5" : "#d1d5db"};
                 }
                 .select-component .select__menu {
                     z-index: 50;
@@ -122,13 +109,13 @@ export default function ClientSelect({
                 }
             `}</style>
 
-            {/* Display selected client information */}
-            {selectedClient && (
+            {/* Display selected employee information */}
+            {selectedEmployee && (
                 <div className="mt-2 p-3 bg-primary-50 rounded-md border border-primary-200 relative">
                     {/* Clear button */}
                     <button
                         className="absolute top-2 right-2 p-1 rounded-full clear-button hover:bg-gray-200 transition-colors"
-                        onClick={() => onClientSelect(null)}
+                        onClick={() => onEmployeeSelect(null)}
                         disabled={disabled}
                         title={t("clearSearch")}
                         aria-label={t("clearSearch")}
@@ -137,15 +124,17 @@ export default function ClientSelect({
                     </button>
 
                     <p className="text-sm font-medium text-gray-700">
-                        {t("selectedClient")}:
+                        {t("selectedEmployee")}:
                     </p>
                     <div className="mt-1 flex items-center">
-                        <UserCircleIcon className="h-5 w-5 text-primary-600 mr-2" />
+                        <UserIcon className="h-5 w-5 text-primary-600 mr-2" />
                         <p className="text-sm text-primary-800">
                             <span className="font-semibold">
-                                {selectedClient.accountId}
-                            </span>{" "}
-                            - {selectedClient.name}
+                                {selectedEmployee.employee_id}
+                            </span>
+                            {selectedEmployee.employee_name && (
+                                <span> - {selectedEmployee.employee_name}</span>
+                            )}
                         </p>
                     </div>
                 </div>

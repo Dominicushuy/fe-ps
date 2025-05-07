@@ -73,9 +73,6 @@ export default function DateRangeFilter({
 
     return (
         <div className="w-full">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-                {t("dateFilter")}
-            </label>
             <div ref={dropdownRef} className="relative">
                 <button
                     type="button"

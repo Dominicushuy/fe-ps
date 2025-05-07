@@ -14,6 +14,7 @@ import { useClients } from "./useClients";
 
 interface UseActivityQueryParams {
     clientId?: string | null;
+    employeeId?: string | null;
     status?: ActivityStatus | "All";
     type?: ActivityType | "All";
     dateOption: DateFilterOption;
@@ -96,6 +97,7 @@ const getDateRange = (
  */
 export function useActivityQuery({
     clientId,
+    employeeId,
     status = "All",
     type = "All",
     dateOption,
@@ -116,6 +118,7 @@ export function useActivityQuery({
             "activities",
             {
                 clientId,
+                employeeId,
                 status,
                 type,
                 dateOption,
@@ -142,6 +145,11 @@ export function useActivityQuery({
             // Add client filter if selected
             if (clientId) {
                 apiFilters.client_id = clientId;
+            }
+
+            // Add employee filter if selected
+            if (employeeId) {
+                apiFilters.employee_id = employeeId;
             }
 
             // Add type filter if selected

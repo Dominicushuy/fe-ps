@@ -172,5 +172,9 @@
     "enterValuePerLine": "値を入力... (1行ごとに1つの値)",
     "noAvailableAccounts": "利用可能なアカウントはありません",
     "pleaseSelectClient": "クライアントを選択してください",
-    "csvMustIncludeColumns": "CSVファイルには次の列が必要です"
+    "csvMustIncludeColumns": "CSVファイルには次の列が必要です",
+    "selectEmployee": "従業員を選択",
+    "searchEmployee": "従業員を検索",
+    "selectedEmployee": "選択した従業員",
+    "employee": "従業員"
 }

@@ -1,5 +1,4 @@
 // src/hooks/useActivityManager.ts
-
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import { Client } from "@/types";
@@ -8,6 +7,7 @@ import {
     DateFilterOption,
     ActivityStatus,
     ActivityType,
+    Employee,
 } from "@/types/activity-types";
 import { useClients } from "@/hooks/useClients";
 import { useActivityQuery } from "./useActivityQuery";
@@ -24,6 +24,7 @@ export const useActivityManager = () => {
 
     const [filters, setFilters] = useState<UIActivityFilters>({
         client: null,
+        employee: null,
         dateOption: "Last7Days",
         customStartDate: null,
         customEndDate: null,
@@ -84,6 +85,11 @@ export const useActivityManager = () => {
         setFilters(prev => ({ ...prev, client }));
     }, []);
 
+    // Employee selection handler
+    const handleEmployeeSelect = useCallback((employee: Employee | null) => {
+        setFilters(prev => ({ ...prev, employee }));
+    }, []);
+
     const handleDateOptionChange = useCallback(
         (dateOption: DateFilterOption) => {
             setFilters(prev => ({ ...prev, dateOption }));
@@ -132,6 +138,7 @@ export const useActivityManager = () => {
         refetch,
     } = useActivityQuery({
         clientId: filters.client?.id || null,
+        employeeId: filters.employee?.employee_id || null,
         status: filters.status,
         type: filters.type,
         dateOption: filters.dateOption,
@@ -151,6 +158,7 @@ export const useActivityManager = () => {
         itemsPerPage,
         totalItems: data?.totalCount || 0,
         handleClientSelect,
+        handleEmployeeSelect,
         handleDateOptionChange,
         handleCustomDateChange,
         handleTypeChange,
