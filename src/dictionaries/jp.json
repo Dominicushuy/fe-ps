@@ -43,7 +43,7 @@
     "parameStorageManager": "パラメータストレージマネージャー",
     "modeSelection": "モード選択",
     "selectClient": "選択クライアント",
-    "searchByAccountId": "アカウントIDで検索",
+    "searchClient": "顧客名、IDなどで検索…",
     "loading": "ロード中...",
     "noResultsFound": "検索結果がありません",
     "selectedClient": "選択されたクライアント",

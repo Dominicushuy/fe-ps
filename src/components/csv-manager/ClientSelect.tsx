@@ -79,7 +79,7 @@ export default function ClientSelect({
                     isDisabled={disabled}
                     isLoading={isLoading}
                     isClearable
-                    placeholder={t("searchByAccountId")}
+                    placeholder={t("searchClient")}
                     loadingMessage={() => t("loading")}
                     noOptionsMessage={() => t("noResultsFound")}
                     // Control input value

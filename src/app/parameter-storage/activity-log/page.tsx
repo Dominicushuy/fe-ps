@@ -23,7 +23,6 @@ import {
     AdjustmentsHorizontalIcon,
     XMarkIcon,
     ArrowPathIcon,
-    ServerIcon,
     MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
 import { Activity } from "@/types";
@@ -70,10 +69,6 @@ export default function ActivityLogPage() {
                             {t("activityLog")}
                         </h2>
                         <div className="flex items-center space-x-2">
-                            <span className="text-xs bg-primary-600 px-2 py-1 rounded-full flex items-center">
-                                <ServerIcon className="h-3 w-3 mr-1" />
-                                React Query
-                            </span>
                             <button
                                 onClick={handleRefresh}
                                 className="p-2 bg-primary-600 rounded-full hover:bg-primary-500 transition-colors"
