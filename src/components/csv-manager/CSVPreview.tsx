@@ -288,94 +288,91 @@ export default function CSVPreview({
             </div>
 
             <h3 className="text-lg font-medium text-gray-800 mb-3">
-                {t("csvPreview")}
+                {t("csvPreview")} ({previewData.length} {t("rows")})
             </h3>
 
             <div className="overflow-x-auto rounded-lg border border-gray-200">
-                <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th
-                                scope="col"
-                                className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
-                            >
-                                Row
-                            </th>
-                            {headers.map(header => (
+                <div className="max-h-[500px] overflow-y-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                        <thead className="bg-gray-50 sticky top-0 z-10">
+                            <tr>
                                 <th
-                                    key={header}
                                     scope="col"
-                                    className={`px-4 py-3 text-left text-xs font-medium ${
-                                        requiredColumns.includes(header)
-                                            ? "text-blue-600"
-                                            : "text-gray-500"
-                                    } uppercase tracking-wider whitespace-nowrap`}
+                                    className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap"
                                 >
-                                    {header}
-                                    {requiredColumns.includes(header) && " *"}
+                                    Row
                                 </th>
-                            ))}
-                        </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                        {/* Render the first 5 rows only for preview */}
-                        {previewData.slice(0, 5).map((row, rowIndex) => (
-                            <tr
-                                key={rowIndex}
-                                className={
-                                    rowIndex % 2 === 0
-                                        ? "bg-white"
-                                        : "bg-gray-50"
-                                }
-                            >
-                                <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
-                                    {rowIndex + 1}
-                                </td>
-                                {headers.map(header => {
-                                    // Check if this cell has an error
-                                    const cellError = errors.find(
-                                        err =>
-                                            err.rowIndex === rowIndex &&
-                                            err.columnName === header,
-                                    );
-
-                                    return (
-                                        <td
-                                            key={`${rowIndex}-${header}`}
-                                            className={`px-4 py-2 whitespace-nowrap text-sm ${
-                                                cellError
-                                                    ? "bg-red-100 text-red-900"
-                                                    : "text-gray-900"
-                                            }`}
-                                        >
-                                            {row[header] || (
-                                                <span className="text-red-500 italic">
-                                                    {t("emptyCell")}
-                                                </span>
-                                            )}
-                                            {cellError && (
-                                                <div className="text-xs text-red-600 mt-1">
-                                                    {cellError.message}
-                                                </div>
-                                            )}
-                                        </td>
-                                    );
-                                })}
+                                {headers.map(header => (
+                                    <th
+                                        key={header}
+                                        scope="col"
+                                        className={`px-4 py-3 text-left text-xs font-medium ${
+                                            requiredColumns.includes(header)
+                                                ? "text-blue-600"
+                                                : "text-gray-500"
+                                        } uppercase tracking-wider whitespace-nowrap`}
+                                    >
+                                        {header}
+                                        {requiredColumns.includes(header) &&
+                                            " *"}
+                                    </th>
+                                ))}
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-gray-200">
+                            {/* Render all rows */}
+                            {previewData.map((row, rowIndex) => (
+                                <tr
+                                    key={rowIndex}
+                                    className={
+                                        rowIndex % 2 === 0
+                                            ? "bg-white"
+                                            : "bg-gray-50"
+                                    }
+                                >
+                                    <td className="px-4 py-2 whitespace-nowrap text-sm text-gray-500">
+                                        {rowIndex + 1}
+                                    </td>
+                                    {headers.map(header => {
+                                        // Check if this cell has an error
+                                        const cellError = errors.find(
+                                            err =>
+                                                err.rowIndex === rowIndex &&
+                                                err.columnName === header,
+                                        );
+
+                                        return (
+                                            <td
+                                                key={`${rowIndex}-${header}`}
+                                                className={`px-4 py-2 whitespace-nowrap text-sm ${
+                                                    cellError
+                                                        ? "bg-red-100 text-red-900"
+                                                        : "text-gray-900"
+                                                }`}
+                                            >
+                                                {row[header] || (
+                                                    <span className="text-red-500 italic">
+                                                        {t("emptyCell")}
+                                                    </span>
+                                                )}
+                                                {cellError && (
+                                                    <div className="text-xs text-red-600 mt-1">
+                                                        {cellError.message}
+                                                    </div>
+                                                )}
+                                            </td>
+                                        );
+                                    })}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
-            {/* Show preview indication if data has more than 5 rows */}
-            {previewData.length > 5 && (
-                <p className="text-sm text-gray-500 mt-2">
-                    {t("previewShowsFirstRows", {
-                        "0": "5",
-                        "1": previewData.length.toString(),
-                    })}
-                </p>
-            )}
+            <p className="text-sm text-gray-500 mt-2">
+                {t("totalRows", { "0": previewData.length.toString() })}
+            </p>
 
             {/* Error summary */}
             {!isValid && (
@@ -515,14 +512,14 @@ export default function CSVPreview({
                 <div className="flex justify-end">
                     <button
                         type="button"
+                        onClick={handleSubmit}
+                        disabled={!isValid || isSubmitting}
                         className={`inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white 
                         ${
                             isValid
                                 ? "bg-blue-600 hover:bg-blue-700 focus:ring-blue-500"
                                 : "bg-gray-400 cursor-not-allowed"
                         } focus:outline-none focus:ring-2 focus:ring-offset-2`}
-                        disabled={!isValid || isSubmitting}
-                        onClick={handleSubmit}
                     >
                         {isSubmitting ? (
                             <>
