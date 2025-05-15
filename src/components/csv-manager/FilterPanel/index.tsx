@@ -13,10 +13,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { ColumnFilter, FilterOperator } from "@/types";
 import FilterItem, { operatorNeedsValue } from "./FilterItem";
-
-// Tạo ID ngẫu nhiên cho filter
-const generateFilterId = () =>
-    `filter_${Math.random().toString(36).substr(2, 9)}`;
+import { createNewFilter } from "@/lib/utils/filter-utils";
 
 interface FilterPanelProps {
     filters: ColumnFilter[];
@@ -34,12 +31,8 @@ export default function FilterPanel({
 
     // Thêm một filter mới
     const handleAddFilter = () => {
-        const newFilter: ColumnFilter = {
-            id: generateFilterId(),
-            columnName: columns[0],
-            operator: "ALL", // Updated from "all" to "ALL"
-            value: "",
-        };
+        // Sử dụng hàm createNewFilter từ filter-utils để tạo filter mới với operator hợp lệ
+        const newFilter = createNewFilter(columns[0]);
         onFilterChange([...filters, newFilter]);
         setIsExpanded(true); // Mở rộng panel khi thêm filter mới
     };

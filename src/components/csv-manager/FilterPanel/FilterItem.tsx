@@ -22,7 +22,7 @@ export default function FilterItem({
 }: FilterItemProps) {
     const t = useTranslations();
 
-    // Danh sách các toán tử lọc với nhãn tiếng Nhật và tiếng Anh - đã loại bỏ "ALL" và "other"
+    // Danh sách các toán tử lọc với nhãn tiếng Nhật và tiếng Anh
     const operators: { value: FilterOperator; label: string }[] = [
         {
             value: "CASE_CONTAIN_AND",
@@ -44,7 +44,10 @@ export default function FilterItem({
             value: "CASE_END_WITH",
             label: t("operatorEndsWith"),
         },
-        { value: "CASE_EQUAL", label: t("operatorEquals") },
+        {
+            value: "CASE_EQUAL",
+            label: t("operatorEquals"),
+        },
         {
             value: "CASE_NOT_EQUAL",
             label: t("operatorNotEquals"),

@@ -92,6 +92,16 @@ export async function createDownloadProcess(
                 return null;
             }
 
+            // Map "ALL" operator to "CONTAIN_AND" hoặc operator mặc định khác nếu cần
+            let operator = filter.operator;
+            if (operator === "ALL") {
+                operator = "CONTAIN_AND"; // Chọn operator hợp lệ từ OPERATOR_CHOICES
+                console.info("Converted 'ALL' operator to 'CONTAIN_AND'");
+            } else if (operator === "other") {
+                operator = "CONTAIN_OR"; // Chọn operator hợp lệ từ OPERATOR_CHOICES
+                console.info("Converted 'other' operator to 'CONTAIN_OR'");
+            }
+
             // Split the filter value by newlines to create an array of values
             const values = filter.value
                 .split("\n")
@@ -101,7 +111,7 @@ export async function createDownloadProcess(
             return {
                 column: apiColumnName,
                 condition: {
-                    operator: filter.operator,
+                    operator: operator,
                     value: values.length > 0 ? values : [""],
                 },
             };

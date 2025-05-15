@@ -149,7 +149,7 @@ export function createNewFilter(columnName: string): ColumnFilter {
     return {
         id: `filter_${Math.random().toString(36).substr(2, 9)}`,
         columnName,
-        operator: "CASE_CONTAIN_OR", // Default to a commonly used operator
+        operator: "CASE_CONTAIN_OR", // Operator hợp lệ từ danh sách OPERATOR_CHOICES
         value: "",
     };
 }
